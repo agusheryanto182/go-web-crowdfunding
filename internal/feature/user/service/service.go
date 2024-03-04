@@ -21,22 +21,7 @@ func NewUserService(userRepo user.UserRepositoryInterface, hash utils.HashInterf
 	}
 }
 
-func (s *UserServiceImpl) CreateUser(payload *dto.RegisterUserRequest) (*entity.UserModels, error) {
-	user := entity.UserModels{
-		Name:       payload.Name,
-		Occupation: payload.Occupation,
-		Email:      payload.Email,
-	}
 
-	passwordHash, err := s.hash.GenerateHash(payload.Password)
-	if err != nil {
-		return &entity.UserModels{}, errors.New("failed to generate hash")
-	}
-
-	user.Password = passwordHash
-
-	return &user, nil
-}
 
 func (s *UserServiceImpl) UpdateUser(userID int, payload *dto.UpdateUserRequest) (*entity.UserModels, error) {
 	if _, err := s.userRepo.GetByID(userID); err != nil {
@@ -49,4 +34,22 @@ func (s *UserServiceImpl) UpdateUser(userID int, payload *dto.UpdateUserRequest)
 	}
 
 	return result, nil
+}
+
+func (s *UserServiceImpl) GetByID(userID int) (*entity.UserModels, error) {
+	result, err := s.userRepo.GetByID(userID)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	return result, nil
+}
+
+func (s *UserServiceImpl) IsAvailableEmail(email string) (bool, error) {
+	_, err := s.userRepo.IsAvailableEmail(email)
+	if err != nil {
+		return false, errors.New("email is not found")
+	}
+
+	return true, nil
 }

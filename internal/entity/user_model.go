@@ -13,3 +13,7 @@ type UserModels struct {
 	CreatedAt  time.Time `gorm:"column:created_at;type:timestamp DEFAULT CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt  time.Time `gorm:"column:updated_at;type:timestamp DEFAULT CURRENT_TIMESTAMP" json:"updated_at"`
 }
+
+func (UserModels) TableName() string {
+	return "users"
+}

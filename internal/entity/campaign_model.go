@@ -6,7 +6,7 @@ import (
 	"github.com/leekchan/accounting"
 )
 
-type Campaign struct {
+type CampaignModels struct {
 	ID               int
 	UserID           int
 	Name             string
@@ -18,25 +18,33 @@ type Campaign struct {
 	CurrentAmount    int
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
-	CampaignImages   []CampaignImage
+	CampaignImages   []CampaignImageModels
 	User             UserModels
 }
 
-func (c Campaign) GoalAmountFormatIDR() string {
+func (c CampaignModels) GoalAmountFormatIDR() string {
 	ac := accounting.Accounting{Symbol: "Rp", Precision: 2, Thousand: ".", Decimal: ","}
 	return ac.FormatMoney(c.GoalAmount)
 }
 
-func (c Campaign) CurrentAmountFormatIDR() string {
+func (c CampaignModels) CurrentAmountFormatIDR() string {
 	ac := accounting.Accounting{Symbol: "Rp", Precision: 2, Thousand: ".", Decimal: ","}
 	return ac.FormatMoney(c.CurrentAmount)
 }
 
-type CampaignImage struct {
+type CampaignImageModels struct {
 	ID         int
 	CampaignID int
 	FileName   string
 	IsPrimary  int
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+}
+
+func (CampaignModels) TableName() string {
+	return "campaigns"
+}
+
+func (CampaignImageModels) TableName() string {
+	return "campaign_images"
 }

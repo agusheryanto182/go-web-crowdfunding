@@ -7,17 +7,17 @@ import (
 )
 
 type UserRepositoryInterface interface {
-	CreateUser(user *entity.UserModels) (*entity.UserModels, error)
 	UpdateUser(userID int, user *dto.UpdateUserRequest) (*entity.UserModels, error)
 	GetByID(userID int) (*entity.UserModels, error)
+	IsAvailableEmail(email string) (*entity.UserModels, error)
 }
 
 type UserServiceInterface interface {
-	CreateUser(payload *dto.RegisterUserRequest) (*entity.UserModels, error)
 	UpdateUser(userID int, payload *dto.UpdateUserRequest) (*entity.UserModels, error)
+	GetByID(userID int) (*entity.UserModels, error)
+	IsAvailableEmail(email string) (bool, error)
 }
 
 type UserHandlerInterface interface {
-	Create(c *fiber.Ctx) error
 	Update(c *fiber.Ctx) error
 }

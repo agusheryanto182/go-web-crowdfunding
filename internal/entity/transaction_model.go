@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Transaction struct {
+type TransactionModels struct {
 	ID         int
 	CampaignID int
 	UserID     int
@@ -13,8 +13,12 @@ type Transaction struct {
 	Status     string
 	Code       string
 	PaymentURL string
-	Campaign   Campaign
+	Campaign   CampaignModels
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	User       user.User
+}
+
+func (TransactionModels) TableName() string {
+	return "transactions"
 }
