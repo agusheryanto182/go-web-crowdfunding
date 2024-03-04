@@ -8,6 +8,7 @@ import (
 
 type AuthRepositoryInterface interface {
 	SignUp(user *entity.UserModels) (*entity.UserModels, error)
+	SaveOTP(OTP *entity.OTPModels) (*entity.OTPModels, error)
 }
 
 type AuthServiceInterface interface {

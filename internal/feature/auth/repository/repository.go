@@ -22,3 +22,10 @@ func (r *AuthRepositoryImpl) SignUp(user *entity.UserModels) (*entity.UserModels
 	}
 	return user, nil
 }
+
+func (r *AuthRepositoryImpl) SaveOTP(OTP *entity.OTPModels) (*entity.OTPModels, error) {
+	if err := r.DB.Create(&OTP).Error; err != nil {
+		return nil, err
+	}
+	return OTP, nil
+}

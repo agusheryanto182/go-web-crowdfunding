@@ -13,7 +13,9 @@ import (
 	userService "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user/service"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/middleware"
 	"github.com/agusheryanto182/go-web-crowdfunding/routes"
+	"github.com/agusheryanto182/go-web-crowdfunding/utils/caching/redis"
 	"github.com/agusheryanto182/go-web-crowdfunding/utils/database"
+	"github.com/agusheryanto182/go-web-crowdfunding/utils/email"
 	utils "github.com/agusheryanto182/go-web-crowdfunding/utils/hash"
 	Njwt "github.com/agusheryanto182/go-web-crowdfunding/utils/jwt"
 	"github.com/gofiber/fiber/v2"
@@ -28,6 +30,9 @@ func main() {
 
 	hash := utils.NewHash()
 	jwt := Njwt.NewJWT(bootConfig.Secret)
+	rdb := redis.InitialRedis(*bootConfig)
+	cache := redis.NewRedisClient(rdb)
+	mail := email.NewEmailService(rdb)
 
 	DB := database.InitialDB(*bootConfig)
 
@@ -38,7 +43,7 @@ func main() {
 	userHandler := userHandler.NewUserHandler(userService)
 
 	authRepo := authRepo.NewAuthRepository(DB)
-	authService := authService.NewAuthService(authRepo, userService, hash)
+	authService := authService.NewAuthService(authRepo, userService, hash, mail, cache)
 	authHandler := authHandler.NewAuthHandler(authService)
 
 	app.Use(middleware.Logging())
@@ -47,7 +52,10 @@ func main() {
 	routes.AuthRoute(app, authHandler, jwt, userService)
 
 	addr := fmt.Sprintf(":%d", bootConfig.AppPort)
+	go email.Worker(rdb)
+
 	if err := app.Listen(addr).Error(); err != addr {
 		panic("Application failed to start")
 	}
+
 }

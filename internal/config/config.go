@@ -12,6 +12,7 @@ type Config struct {
 	AppPort  int
 	Secret   string
 	Database database
+	Redis    Redis
 }
 
 type database struct {
@@ -20,6 +21,11 @@ type database struct {
 	DbUser string
 	DbPass string
 	DbName string
+}
+
+type Redis struct {
+	Addr string
+	Pass string
 }
 
 func loadConfig() *Config {
@@ -63,6 +69,14 @@ func loadConfig() *Config {
 
 	if value, found := os.LookupEnv("DBNAME"); found {
 		res.Database.DbName = value
+	}
+
+	if value, found := os.LookupEnv("REDIS_ADDR"); found {
+		res.Redis.Addr = value
+	}
+
+	if value, found := os.LookupEnv("REDIS_PASS"); found {
+		res.Redis.Pass = value
 	}
 
 	return res

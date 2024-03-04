@@ -11,7 +11,8 @@ import (
 )
 
 func InitialDB(cnf config.Config) *gorm.DB {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", cnf.Database.DbUser, cnf.Database.DbPass, cnf.Database.DbHost, cnf.Database.DbPort, cnf.Database.DbName)
+	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", cnf.Database.DbUser, cnf.Database.DbPass, cnf.Database.DbHost, cnf.Database.DbPort, cnf.Database.DbName)
+	dsn := fmt.Sprintf("root:root@tcp(localhost:3306)/db_crowdfunding?charset=utf8mb4&parseTime=True&loc=Local")
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to open database", err.Error())
@@ -24,6 +25,7 @@ func InitialDB(cnf config.Config) *gorm.DB {
 func TableMigration(db *gorm.DB) {
 	err := db.AutoMigrate(
 		entity.UserModels{},
+		entity.OTPModels{},
 	)
 	if err != nil {
 		log.Fatal("Migration table is failed", err.Error())
