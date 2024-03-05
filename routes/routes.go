@@ -17,4 +17,5 @@ func AuthRoute(app *fiber.App, handler auth.AuthHandlerInterface, jwtService jwt
 	authGroup := app.Group("api/v1/auth")
 	authGroup.Post("/sign-up", handler.SignUp)
 	authGroup.Post("/verify-otp", handler.VerifyOTP)
+	authGroup.Post("/sign-in", handler.SignIn)
 }

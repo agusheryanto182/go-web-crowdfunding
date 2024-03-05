@@ -58,3 +58,22 @@ func (h *AuthHandlerImpl) VerifyOTP(c *fiber.Ctx) error {
 
 	return response.SendStatusOkWithDataResponse(c, "verification is success", result)
 }
+
+func (h *AuthHandlerImpl) SignIn(c *fiber.Ctx) error {
+	requestSignIn := &dto.SignInUserRequest{}
+
+	if err := c.BodyParser(requestSignIn); err != nil {
+		return response.SendStatusBadRequest(c, "invalid input")
+	}
+
+	if err := validator.ValidateStruct(requestSignIn); err != nil {
+		return response.SendStatusBadRequest(c, "validation error : "+err.Error())
+	}
+
+	accessToken, err := h.authService.SignIn(requestSignIn)
+	if err != nil {
+		return response.SendStatusForbidden(c, "failed SignIn : "+err.Error())
+	}
+
+	return response.SendStatusCreatedWithDataResponse(c, "success", accessToken)
+}

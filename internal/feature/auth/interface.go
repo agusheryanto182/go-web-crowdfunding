@@ -16,9 +16,11 @@ type AuthRepositoryInterface interface {
 type AuthServiceInterface interface {
 	SignUp(user *dto.RegisterUserRequest) (*entity.UserModels, error)
 	VerifyOTP(email string, OTP string) (string, error)
+	SignIn(payload *dto.SignInUserRequest) (string, error)
 }
 
 type AuthHandlerInterface interface {
 	SignUp(c *fiber.Ctx) error
 	VerifyOTP(c *fiber.Ctx) error
+	SignIn(c *fiber.Ctx) error
 }

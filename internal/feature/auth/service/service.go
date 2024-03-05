@@ -95,12 +95,6 @@ func (s *AuthServiceImpl) SignUp(payload *dto.RegisterUserRequest) (*entity.User
 }
 
 func (s *AuthServiceImpl) VerifyOTP(email, OTP string) (string, error) {
-	emailVerifyCacheKey := generateCacheKey(email, "verify_status")
-	isVerified, err := s.cache.Get(emailVerifyCacheKey)
-	if err == nil && string(isVerified) == "true" {
-		return "", errors.New("email is verified")
-	}
-
 	user, err := s.userService.GetUserByEmail(email)
 	if err != nil {
 		return "", err
@@ -108,12 +102,6 @@ func (s *AuthServiceImpl) VerifyOTP(email, OTP string) (string, error) {
 
 	if user.IsVerified {
 		return "", errors.New("your account has been verified")
-	}
-
-	accessTokenCacheKey := generateCacheKey(email, "access_token")
-	cachedToken, err := s.cache.Get(accessTokenCacheKey)
-	if err == nil {
-		return string(cachedToken), nil
 	}
 
 	isValidOTP, err := s.authRepo.FindValidOTP(int(user.ID), OTP)
@@ -136,9 +124,31 @@ func (s *AuthServiceImpl) VerifyOTP(email, OTP string) (string, error) {
 		return "", errors.New("failed to generate jwt : " + err.Error())
 	}
 
-	err = s.cache.Set(emailVerifyCacheKey, []byte("true"), 1*time.Second)
+	return accessToken, nil
+}
+
+func (s *AuthServiceImpl) SignIn(payload *dto.SignInUserRequest) (string, error) {
+	check, err := s.userService.GetUserByEmail(payload.Email)
 	if err != nil {
-		return "", errors.New("failed to save verify email status to cache")
+		return "", err
+	}
+
+	if !check.IsVerified {
+		return "", errors.New("account has not been verified")
+	}
+
+	validPassword, err := s.hash.ComparePassword(check.Password, payload.Password)
+	if err != nil {
+		return "", err
+	}
+
+	if !validPassword {
+		return "", errors.New("invalid credentials")
+	}
+
+	accessToken, err := s.nJWT.GenerateJWT(check.ID, check.Email, check.Role)
+	if err != nil {
+		return "", errors.New("failed to generate jwt")
 	}
 
 	return accessToken, nil

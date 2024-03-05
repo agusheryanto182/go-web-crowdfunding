@@ -58,5 +58,5 @@ func (h *Hash) ComparePassword(hash, password string) (bool, error) {
 		return true, nil
 	}
 
-	return false, errors.New("password mismatch")
+	return false, errors.New("invalid credentials")
 }
