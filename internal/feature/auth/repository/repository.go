@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/entity"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/auth"
 	"gorm.io/gorm"
@@ -28,4 +30,19 @@ func (r *AuthRepositoryImpl) SaveOTP(OTP *entity.OTPModels) (*entity.OTPModels, 
 		return nil, err
 	}
 	return OTP, nil
+}
+
+func (r *AuthRepositoryImpl) FindValidOTP(userID int, OTP string) (*entity.OTPModels, error) {
+	var validOTP *entity.OTPModels
+	if err := r.DB.Where("user_id = ? AND otp = ? AND expired_otp > ?", userID, OTP, time.Now().Unix()).First(&validOTP).Error; err != nil {
+		return validOTP, err
+	}
+	return validOTP, nil
+}
+
+func (r *AuthRepositoryImpl) DeleteOTP(OTP *entity.OTPModels) error {
+	if err := r.DB.Where("id = ?", OTP.ID).Delete(&OTP).Error; err != nil {
+		return err
+	}
+	return nil
 }

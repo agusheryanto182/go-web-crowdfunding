@@ -7,3 +7,8 @@ type RegisterUserRequest struct {
 	Password        string `json:"password" validate:"required,eqfield=PasswordConfirm"`
 	PasswordConfirm string `json:"password_confirm" validate:"required"`
 }
+
+type VerifyOTPRequest struct {
+	Email string `form:"email" json:"email" validate:"required,email"`
+	OTP   string `form:"otp" json:"otp" validate:"required"`
+}

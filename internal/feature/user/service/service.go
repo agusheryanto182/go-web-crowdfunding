@@ -21,14 +21,18 @@ func NewUserService(userRepo user.UserRepositoryInterface, hash utils.HashInterf
 	}
 }
 
-
-
 func (s *UserServiceImpl) UpdateUser(userID int, payload *dto.UpdateUserRequest) (*entity.UserModels, error) {
-	if _, err := s.userRepo.GetByID(userID); err != nil {
+	user, err := s.userRepo.GetByID(userID)
+	if err != nil {
 		return nil, errors.New("user not found")
 	}
 
-	result, err := s.userRepo.UpdateUser(userID, payload)
+	user.Name = payload.Name
+	user.Email = payload.Email
+	user.Occupation = payload.Occupation
+	user.Password = payload.Password
+
+	result, err := s.userRepo.UpdateUser(user)
 	if err != nil {
 		return nil, err
 	}
@@ -45,11 +49,11 @@ func (s *UserServiceImpl) GetByID(userID int) (*entity.UserModels, error) {
 	return result, nil
 }
 
-func (s *UserServiceImpl) IsAvailableEmail(email string) (bool, error) {
-	_, err := s.userRepo.IsAvailableEmail(email)
+func (s *UserServiceImpl) GetUserByEmail(email string) (*entity.UserModels, error) {
+	result, err := s.userRepo.FindUserByEmail(email)
 	if err != nil {
-		return false, errors.New("email is not found")
+		return nil, errors.New("email is not found")
 	}
 
-	return true, nil
+	return result, nil
 }

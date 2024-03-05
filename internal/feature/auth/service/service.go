@@ -12,36 +12,47 @@ import (
 	"github.com/agusheryanto182/go-web-crowdfunding/utils/caching"
 	"github.com/agusheryanto182/go-web-crowdfunding/utils/email"
 	utils "github.com/agusheryanto182/go-web-crowdfunding/utils/hash"
+	"github.com/agusheryanto182/go-web-crowdfunding/utils/jwt"
 	"github.com/agusheryanto182/go-web-crowdfunding/utils/otp"
 )
 
 type AuthServiceImpl struct {
 	authRepo    auth.AuthRepositoryInterface
+	userRepo    user.UserRepositoryInterface
 	userService user.UserServiceInterface
 	hash        utils.HashInterface
 	email       email.EmailSenderInterface
 	cache       caching.CacheRepository
+	nJWT        jwt.IJwt
 }
 
 func NewAuthService(
 	authRepo auth.AuthRepositoryInterface,
+	userRepo user.UserRepositoryInterface,
 	userService user.UserServiceInterface,
 	hash utils.HashInterface,
 	email email.EmailSenderInterface,
 	cache caching.CacheRepository,
+	nJWT jwt.IJwt,
 ) auth.AuthServiceInterface {
 	return &AuthServiceImpl{
 		authRepo:    authRepo,
+		userRepo:    userRepo,
 		userService: userService,
 		hash:        hash,
 		email:       email,
 		cache:       cache,
+		nJWT:        nJWT,
 	}
 }
 
+func generateCacheKey(email, action string) string {
+	return fmt.Sprintf("auth:%s:%s", email, action)
+}
+
 func (s *AuthServiceImpl) SignUp(payload *dto.RegisterUserRequest) (*entity.UserModels, error) {
-	isExistEmail, _ := s.userService.IsAvailableEmail(payload.Email)
-	if isExistEmail {
+	userByEmail, _ := s.userService.GetUserByEmail(payload.Email)
+	if userByEmail != nil {
 		return nil, errors.New("email is already exist")
 	}
 
@@ -75,12 +86,60 @@ func (s *AuthServiceImpl) SignUp(payload *dto.RegisterUserRequest) (*entity.User
 		return nil, err
 	}
 
-	fmt.Println(result.Email)
-
 	err = s.email.QueueEmail(result.Email, generateOTP)
 	if err != nil {
 		return nil, err
 	}
 
 	return result, nil
+}
+
+func (s *AuthServiceImpl) VerifyOTP(email, OTP string) (string, error) {
+	emailVerifyCacheKey := generateCacheKey(email, "verify_status")
+	isVerified, err := s.cache.Get(emailVerifyCacheKey)
+	if err == nil && string(isVerified) == "true" {
+		return "", errors.New("email is verified")
+	}
+
+	user, err := s.userService.GetUserByEmail(email)
+	if err != nil {
+		return "", err
+	}
+
+	if user.IsVerified {
+		return "", errors.New("your account has been verified")
+	}
+
+	accessTokenCacheKey := generateCacheKey(email, "access_token")
+	cachedToken, err := s.cache.Get(accessTokenCacheKey)
+	if err == nil {
+		return string(cachedToken), nil
+	}
+
+	isValidOTP, err := s.authRepo.FindValidOTP(int(user.ID), OTP)
+	if err != nil {
+		return "", errors.New("invalid otp : " + err.Error())
+	}
+
+	user.IsVerified = true
+
+	if _, err := s.userRepo.UpdateUser(user); err != nil {
+		return "", errors.New("failed to update user : " + err.Error())
+	}
+
+	if err := s.authRepo.DeleteOTP(isValidOTP); err != nil {
+		return "", errors.New("failed to delete otp : " + err.Error())
+	}
+
+	accessToken, err := s.nJWT.GenerateJWT(user.ID, user.Email, user.Role)
+	if err != nil {
+		return "", errors.New("failed to generate jwt : " + err.Error())
+	}
+
+	err = s.cache.Set(emailVerifyCacheKey, []byte("true"), 1*time.Second)
+	if err != nil {
+		return "", errors.New("failed to save verify email status to cache")
+	}
+
+	return accessToken, nil
 }

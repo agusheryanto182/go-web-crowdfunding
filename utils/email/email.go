@@ -53,7 +53,7 @@ func (s *Sender) QueueEmail(email, otp string) error {
 	return nil
 }
 
-// Worker adalah fungsi yang berjalan sebagai pekerja belakang untuk mengirim email dari antrian Redis
+// Worker is a function that runs as a backend worker to send emails from a Redis queue
 func Worker(rdb *redis.Client) {
 	fmt.Println("Starting email worker")
 	for {
@@ -99,7 +99,7 @@ func sendEmail(email, otp string) error {
 		return err
 	}
 
-	m.Subject("Verifikasi Email - Disappear Organization")
+	m.Subject("Verifikasi Email - Mahasibuk")
 	emailTemplate := struct {
 		OTP   string
 		Email string

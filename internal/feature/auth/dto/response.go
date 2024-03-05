@@ -28,3 +28,7 @@ func FormatCreateUserResponse(user *entity.UserModels) UserResponse {
 
 	return createdUser
 }
+
+type VerifyOTPResponse struct {
+	AccessToken string `json:"access_token`
+}

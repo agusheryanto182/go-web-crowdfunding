@@ -43,7 +43,7 @@ func main() {
 	userHandler := userHandler.NewUserHandler(userService)
 
 	authRepo := authRepo.NewAuthRepository(DB)
-	authService := authService.NewAuthService(authRepo, userService, hash, mail, cache)
+	authService := authService.NewAuthService(authRepo, userRepo, userService, hash, mail, cache, jwt)
 	authHandler := authHandler.NewAuthHandler(authService)
 
 	app.Use(middleware.Logging())
@@ -52,6 +52,7 @@ func main() {
 	routes.AuthRoute(app, authHandler, jwt, userService)
 
 	addr := fmt.Sprintf(":%d", bootConfig.AppPort)
+
 	go email.Worker(rdb)
 
 	if err := app.Listen(addr).Error(); err != addr {

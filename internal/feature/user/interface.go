@@ -7,15 +7,15 @@ import (
 )
 
 type UserRepositoryInterface interface {
-	UpdateUser(userID int, user *dto.UpdateUserRequest) (*entity.UserModels, error)
+	UpdateUser(user *entity.UserModels) (*entity.UserModels, error)
 	GetByID(userID int) (*entity.UserModels, error)
-	IsAvailableEmail(email string) (*entity.UserModels, error)
+	FindUserByEmail(email string) (*entity.UserModels, error)
 }
 
 type UserServiceInterface interface {
 	UpdateUser(userID int, payload *dto.UpdateUserRequest) (*entity.UserModels, error)
 	GetByID(userID int) (*entity.UserModels, error)
-	IsAvailableEmail(email string) (bool, error)
+	GetUserByEmail(email string) (*entity.UserModels, error)
 }
 
 type UserHandlerInterface interface {

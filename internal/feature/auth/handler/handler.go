@@ -36,3 +36,25 @@ func (h *AuthHandlerImpl) SignUp(c *fiber.Ctx) error {
 
 	return response.SendStatusOkWithDataResponse(c, "success to create user", dto.FormatCreateUserResponse(result))
 }
+
+func (h *AuthHandlerImpl) VerifyOTP(c *fiber.Ctx) error {
+	var requestVerify dto.VerifyOTPRequest
+	if err := c.BodyParser(&requestVerify); err != nil {
+		return response.SendStatusBadRequest(c, "invalid input")
+	}
+
+	if err := validator.ValidateStruct(&requestVerify); err != nil {
+		return response.SendStatusBadRequest(c, "validation error : "+err.Error())
+	}
+
+	accessToken, err := h.authService.VerifyOTP(requestVerify.Email, requestVerify.OTP)
+	if err != nil {
+		return response.SendStatusBadRequest(c, "verify otp is failed : "+err.Error())
+	}
+
+	result := dto.VerifyOTPResponse{
+		AccessToken: accessToken,
+	}
+
+	return response.SendStatusOkWithDataResponse(c, "verification is success", result)
+}
