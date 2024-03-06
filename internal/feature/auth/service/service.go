@@ -65,7 +65,7 @@ func (s *AuthServiceImpl) SignUp(payload *dto.RegisterUserRequest) (*entity.User
 
 	passwordHash, err := s.hash.GenerateHash(payload.Password)
 	if err != nil {
-		return &entity.UserModels{}, errors.New("failed to generate hash")
+		return nil, errors.New("failed to generate hash")
 	}
 
 	user.Password = passwordHash
@@ -83,12 +83,12 @@ func (s *AuthServiceImpl) SignUp(payload *dto.RegisterUserRequest) (*entity.User
 	}
 
 	if _, err := s.authRepo.SaveOTP(newOTP); err != nil {
-		return nil, err
+		return nil, errors.New("failed to save OTP")
 	}
 
 	err = s.email.QueueEmail(result.Email, generateOTP)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("failed add email to queue")
 	}
 
 	return result, nil

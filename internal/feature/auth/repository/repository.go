@@ -29,7 +29,7 @@ func (r *AuthRepositoryImpl) SaveOTP(OTP *entity.OTPModels) (*entity.OTPModels, 
 	if err := r.DB.Create(&OTP).Error; err != nil {
 		return nil, err
 	}
-	return OTP, nil
+	return OTP, nilp
 }
 
 func (r *AuthRepositoryImpl) FindValidOTP(userID int, OTP string) (*entity.OTPModels, error) {
