@@ -57,3 +57,12 @@ func (s *UserServiceImpl) GetUserByEmail(email string) (*entity.UserModels, erro
 
 	return result, nil
 }
+
+func (s *UserServiceImpl) UploadAvatar(userID int, avatar *dto.UpdateAvatarRequest) (*entity.UserModels, error) {
+	result, err := s.userRepo.UploadAvatar(userID, avatar.Avatar)
+	if err != nil {
+		return nil, errors.New("failed to upload avatar : " + err.Error())
+	}
+
+	return result, nil
+}

@@ -10,14 +10,17 @@ type UserRepositoryInterface interface {
 	UpdateUser(user *entity.UserModels) (*entity.UserModels, error)
 	GetByID(userID int) (*entity.UserModels, error)
 	FindUserByEmail(email string) (*entity.UserModels, error)
+	UploadAvatar(userID int, avatarPath string) (*entity.UserModels, error)
 }
 
 type UserServiceInterface interface {
 	UpdateUser(userID int, payload *dto.UpdateUserRequest) (*entity.UserModels, error)
 	GetByID(userID int) (*entity.UserModels, error)
 	GetUserByEmail(email string) (*entity.UserModels, error)
+	UploadAvatar(userID int, avatar *dto.UpdateAvatarRequest) (*entity.UserModels, error)
 }
 
 type UserHandlerInterface interface {
 	Update(c *fiber.Ctx) error
+	UploadAvatar(c *fiber.Ctx) error
 }

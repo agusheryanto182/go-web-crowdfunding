@@ -40,3 +40,11 @@ func (r *UserRepositoryImpl) FindUserByEmail(email string) (*entity.UserModels, 
 	}
 	return user, nil
 }
+
+func (r *UserRepositoryImpl) UploadAvatar(userID int, avatar string) (*entity.UserModels, error) {
+	user := &entity.UserModels{}
+	if err := r.DB.Model(&user).Where("id = ?", userID).UpdateColumn("avatar", avatar).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}

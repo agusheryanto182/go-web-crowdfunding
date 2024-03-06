@@ -9,8 +9,14 @@ import (
 )
 
 type Config struct {
-	AppPort  int
-	Secret   string
+	AppPort int
+	Secret  string
+
+	CCName      string
+	CCAPIKey    string
+	CCAPISecret string
+	CCFolder    string
+
 	Database database
 	Redis    Redis
 }
@@ -26,6 +32,10 @@ type database struct {
 type Redis struct {
 	Addr string
 	Pass string
+}
+
+func InitConfig() *Config {
+	return loadConfig()
 }
 
 func loadConfig() *Config {
@@ -49,6 +59,20 @@ func loadConfig() *Config {
 
 	if value, found := os.LookupEnv("SECRET"); found {
 		res.Secret = value
+	}
+
+	if value, found := os.LookupEnv("CCNAME"); found {
+		res.CCName = value
+	}
+
+	if value, found := os.LookupEnv("CCAPIKEY"); found {
+		res.CCAPIKey = value
+	}
+	if value, found := os.LookupEnv("CCAPISECRET"); found {
+		res.CCAPISecret = value
+	}
+	if value, found := os.LookupEnv("CCFOLDER"); found {
+		res.CCFolder = value
 	}
 
 	if value, found := os.LookupEnv("DBHOST"); found {
