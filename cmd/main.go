@@ -53,7 +53,7 @@ func main() {
 
 	addr := fmt.Sprintf(":%d", bootConfig.AppPort)
 
-	go email.Worker(rdb)
+	go mail.Worker()
 
 	if err := app.Listen(addr).Error(); err != addr {
 		panic("Application failed to start")

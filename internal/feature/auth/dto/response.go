@@ -30,5 +30,5 @@ func FormatCreateUserResponse(user *entity.UserModels) UserResponse {
 }
 
 type VerifyOTPResponse struct {
-	AccessToken string `json:"access_token`
+	AccessToken string `json:"access_token"`
 }

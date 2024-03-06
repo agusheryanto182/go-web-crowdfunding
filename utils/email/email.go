@@ -19,6 +19,8 @@ import (
 
 type EmailSenderInterface interface {
 	QueueEmail(email, otp string) error
+	Worker()
+	SendEmail(email, otp string) error
 }
 
 type Sender struct {
@@ -54,10 +56,10 @@ func (s *Sender) QueueEmail(email, otp string) error {
 }
 
 // Worker is a function that runs as a backend worker to send emails from a Redis queue
-func Worker(rdb *redis.Client) {
+func (s *Sender) Worker() {
 	fmt.Println("Starting email worker")
 	for {
-		emailBytes, err := rdb.LPop(context.Background(), "email_queue").Bytes()
+		emailBytes, err := s.rdb.LPop(context.Background(), "email_queue").Bytes()
 		if err != nil {
 			time.Sleep(1 * time.Second)
 			continue
@@ -72,7 +74,7 @@ func Worker(rdb *redis.Client) {
 			continue
 		}
 
-		if err := sendEmail(emailData.Email, emailData.OTP); err != nil {
+		if err := s.SendEmail(emailData.Email, emailData.OTP); err != nil {
 			fmt.Println("Error sending email:", err)
 			continue
 		}
@@ -81,7 +83,7 @@ func Worker(rdb *redis.Client) {
 }
 
 // sendEmail adalah fungsi untuk mengirim email
-func sendEmail(email, otp string) error {
+func (s *Sender) SendEmail(email, otp string) error {
 	secretUser := os.Getenv("SMTP_USER")
 	secretPass := os.Getenv("SMTP_PASS")
 	secretPort := os.Getenv("SMTP_PORT")
