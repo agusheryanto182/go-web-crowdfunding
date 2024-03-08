@@ -27,7 +27,7 @@ func (r *UserRepositoryImpl) UpdateUser(user *entity.UserModels) (*entity.UserMo
 
 func (r *UserRepositoryImpl) GetByID(userID int) (*entity.UserModels, error) {
 	user := &entity.UserModels{}
-	if err := r.DB.Where("id = ?", userID).First(&user).Error; err != nil {
+	if err := r.DB.Where("id = ? AND is_verified = ?", userID, true).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
@@ -44,6 +44,14 @@ func (r *UserRepositoryImpl) FindUserByEmail(email string) (*entity.UserModels, 
 func (r *UserRepositoryImpl) UploadAvatar(userID int, avatar string) (*entity.UserModels, error) {
 	user := &entity.UserModels{}
 	if err := r.DB.Model(&user).Where("id = ?", userID).UpdateColumn("avatar", avatar).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (r *UserRepositoryImpl) GetAllUser() ([]*entity.UserModels, error) {
+	var user []*entity.UserModels
+	if err := r.DB.Find(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil

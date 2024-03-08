@@ -66,3 +66,12 @@ func (s *UserServiceImpl) UploadAvatar(userID int, avatar *dto.UpdateAvatarReque
 
 	return result, nil
 }
+
+func (s *UserServiceImpl) GetAllUser() ([]*entity.UserModels, error) {
+	result, err := s.userRepo.GetAllUser()
+	if err != nil {
+		return nil, errors.New("failed to get all user")
+	}
+
+	return result, nil
+}

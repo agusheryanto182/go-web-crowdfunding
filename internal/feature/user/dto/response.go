@@ -25,3 +25,25 @@ func UpdateAvatarResponse(user *entity.UserModels) UploadImageFormatter {
 	response.Avatar = user.Avatar
 	return response
 }
+
+func FormatterUser(user *entity.UserModels) *UserResponse {
+	format := &UserResponse{
+		ID:         user.ID,
+		Name:       user.Name,
+		Occupation: user.Occupation,
+		Email:      user.Email,
+		Avatar:     user.Avatar,
+		CreatedAt:  user.CreatedAt,
+		UpdatedAt:  user.UpdatedAt,
+	}
+	return format
+}
+
+func FormatterUsers(users []*entity.UserModels) []*UserResponse {
+	var format []*UserResponse
+	for _, user := range users {
+		formattedUsers := FormatterUser(user)
+		format = append(format, formattedUsers)
+	}
+	return format
+}

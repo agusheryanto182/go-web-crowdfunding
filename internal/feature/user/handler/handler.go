@@ -72,3 +72,17 @@ func (h *UserHandlerImpl) UploadAvatar(c *fiber.Ctx) error {
 
 	return response.SendStatusOkWithDataResponse(c, "success upload avatar", dto.UpdateAvatarResponse(image))
 }
+
+func (h *UserHandlerImpl) GetAllUser(c *fiber.Ctx) error {
+	currentUser := c.Locals("CurrentUser").(*entity.UserModels)
+	if currentUser.Role != "admin" {
+		return response.SendStatusForbidden(c, "forbidden : you dont have a permission for access this")
+	}
+
+	result, err := h.userService.GetAllUser()
+	if err != nil {
+		return response.SendStatusBadRequest(c, "error : "+err.Error())
+	}
+
+	return response.SendStatusOkWithDataResponse(c, "success", dto.FormatterUsers(result))
+}

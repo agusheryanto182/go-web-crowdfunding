@@ -12,6 +12,7 @@ func UserRoute(app *fiber.App, handler user.UserHandlerInterface, jwtService jwt
 	userGroup := app.Group("api/v1/user")
 	userGroup.Put("/edit-profile", middleware.Protected(jwtService, userService), handler.Update)
 	userGroup.Post("/upload-avatar", middleware.Protected(jwtService, userService), handler.UploadAvatar)
+	userGroup.Get("/", middleware.Protected(jwtService, userService), handler.GetAllUser)
 }
 
 func AuthRoute(app *fiber.App, handler auth.AuthHandlerInterface, jwtService jwt.IJwt, userService user.UserServiceInterface) {

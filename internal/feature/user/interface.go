@@ -11,6 +11,7 @@ type UserRepositoryInterface interface {
 	GetByID(userID int) (*entity.UserModels, error)
 	FindUserByEmail(email string) (*entity.UserModels, error)
 	UploadAvatar(userID int, avatarPath string) (*entity.UserModels, error)
+	GetAllUser() ([]*entity.UserModels, error)
 }
 
 type UserServiceInterface interface {
@@ -18,9 +19,11 @@ type UserServiceInterface interface {
 	GetByID(userID int) (*entity.UserModels, error)
 	GetUserByEmail(email string) (*entity.UserModels, error)
 	UploadAvatar(userID int, avatar *dto.UpdateAvatarRequest) (*entity.UserModels, error)
+	GetAllUser() ([]*entity.UserModels, error)
 }
 
 type UserHandlerInterface interface {
 	Update(c *fiber.Ctx) error
 	UploadAvatar(c *fiber.Ctx) error
+	GetAllUser(c *fiber.Ctx) error
 }
