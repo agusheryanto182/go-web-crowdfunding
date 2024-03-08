@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"math"
 
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/entity"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user"
@@ -67,11 +68,59 @@ func (s *UserServiceImpl) UploadAvatar(userID int, avatar *dto.UpdateAvatarReque
 	return result, nil
 }
 
-func (s *UserServiceImpl) GetAllUser() ([]*entity.UserModels, error) {
-	result, err := s.userRepo.GetAllUser()
+func (s *UserServiceImpl) GetAllUser(page, perPage int) ([]*entity.UserModels, int64, error) {
+	result, err := s.userRepo.FindAllUser(page, perPage)
 	if err != nil {
-		return nil, errors.New("failed to get all user")
+		return nil, 0, errors.New("failed to get all user")
 	}
 
-	return result, nil
+	totalItems, err := s.userRepo.GetTotalUserCount()
+	if err != nil {
+		return nil, 0, errors.New("failed to get total user")
+	}
+
+	return result, totalItems, nil
+}
+
+func (s *UserServiceImpl) GetUserByName(page, perPage int, name string) ([]*entity.UserModels, int64, error) {
+	user, err := s.userRepo.FindUserByName(page, perPage, name)
+	if err != nil {
+		return nil, 0, errors.New("failed to get user by name")
+	}
+
+	totalItems, err := s.userRepo.GetTotalUserCount()
+	if err != nil {
+		return nil, 0, errors.New("failed to get total user")
+	}
+
+	return user, totalItems, nil
+}
+
+func (s *UserServiceImpl) CalculatePaginationValues(page, totalItems, perPage int) (int, int) {
+	if page <= 0 {
+		page = 1
+	}
+
+	totalPages := int(math.Ceil(float64(totalItems) / float64(perPage)))
+	if page > totalPages {
+		page = totalPages
+	}
+
+	return page, totalPages
+}
+
+func (s *UserServiceImpl) GetNextPage(currentPage int, totalPages int) int {
+	if currentPage < totalPages {
+		return currentPage + 1
+	}
+
+	return totalPages
+}
+
+func (s *UserServiceImpl) GetPrevPage(currentPage int) int {
+	if currentPage > 1 {
+		return currentPage - 1
+	}
+
+	return 1
 }

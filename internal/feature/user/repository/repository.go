@@ -49,10 +49,30 @@ func (r *UserRepositoryImpl) UploadAvatar(userID int, avatar string) (*entity.Us
 	return user, nil
 }
 
-func (r *UserRepositoryImpl) GetAllUser() ([]*entity.UserModels, error) {
+func (r *UserRepositoryImpl) FindAllUser(page, perPage int) ([]*entity.UserModels, error) {
 	var user []*entity.UserModels
-	if err := r.DB.Find(&user).Error; err != nil {
+	offset := (page - 1) * perPage
+	if err := r.DB.Offset(offset).Limit(perPage).Find(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
+}
+
+func (r *UserRepositoryImpl) FindUserByName(page, perPage int, name string) ([]*entity.UserModels, error) {
+	var user []*entity.UserModels
+	offset := (page - 1) * perPage
+	query := r.DB.Offset(offset).Limit(perPage)
+	if err := query.Where("name LIKE ?", "%"+name+"%").Find(&user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (r *UserRepositoryImpl) GetTotalUserCount() (int64, error) {
+	var totalItems int64
+
+	if err := r.DB.Model(&entity.UserModels{}).Where("is_verified = ?", true).Count(&totalItems).Error; err != nil {
+		return 0, err
+	}
+	return totalItems, nil
 }

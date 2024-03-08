@@ -2,6 +2,7 @@ package handler
 
 import (
 	"mime/multipart"
+	"strconv"
 
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/entity"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user"
@@ -79,10 +80,31 @@ func (h *UserHandlerImpl) GetAllUser(c *fiber.Ctx) error {
 		return response.SendStatusForbidden(c, "forbidden : you dont have a permission for access this")
 	}
 
-	result, err := h.userService.GetAllUser()
+	page, _ := strconv.Atoi(c.Query("page"))
+	perPage := 8
+
+	var user []*entity.UserModels
+	var totalItems int64
+	var err error
+	search := c.Query("search")
+
+	switch {
+	case search != "":
+		{
+			user, totalItems, err = h.userService.GetUserByName(page, perPage, search)
+		}
+	default:
+		user, totalItems, err = h.userService.GetAllUser(page, perPage)
+	}
 	if err != nil {
-		return response.SendStatusBadRequest(c, "error : "+err.Error())
+		c.Context().Logger()
+		return response.SendStatusInternalServerError(c, "failed to get data user : "+err.Error())
 	}
 
-	return response.SendStatusOkWithDataResponse(c, "success", dto.FormatterUsers(result))
+	currentPage, totalPages := h.userService.CalculatePaginationValues(page, int(totalItems), perPage)
+	nextPage := h.userService.GetNextPage(currentPage, totalPages)
+	prevPage := h.userService.GetPrevPage(currentPage)
+
+	return response.SendPaginationResponse(c, dto.FormatterUsers(user), currentPage, totalPages, int(totalItems), nextPage, prevPage, "success")
+
 }
