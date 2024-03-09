@@ -140,8 +140,28 @@ func (s *CampaignServiceImpl) Save(payload *dto.CreateRequestCampaign) (*entity.
 }
 
 // Update implements campaign.CampaignServiceInterface.
-func (s *CampaignServiceImpl) Update(payload *dto.UpdateRequestCampaign) (*entity.CampaignModels, error) {
-	panic("unimplemented")
+func (s *CampaignServiceImpl) Update(userID int, payload *dto.UpdateRequestCampaign) (*entity.CampaignModels, error) {
+	campaign, _ := s.GetByID(payload.ID)
+	if campaign == nil {
+		return nil, errors.New("campaign with ID : " + strconv.Itoa(payload.ID) + " is not found")
+	}
+
+	if campaign.UserID != userID {
+		return nil, errors.New("invalid credentials")
+	}
+
+	campaign.Name = payload.Name
+	campaign.ShortDescription = payload.ShortDescription
+	campaign.Description = payload.Description
+	campaign.Perks = payload.Perks
+	campaign.GoalAmount = payload.GoalAmount
+
+	result, err := s.repo.Update(campaign)
+	if err != nil {
+		return nil, errors.New("failed to update campaign : " + err.Error())
+	}
+
+	return result, nil
 }
 
 func NewCampaignService(repo campaign.CampaignRepositoryInterface, userService user.UserServiceInterface) campaign.CampaignServiceInterface {

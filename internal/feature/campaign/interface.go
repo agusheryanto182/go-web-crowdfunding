@@ -23,7 +23,7 @@ type CampaignServiceInterface interface {
 	GetByUserID(page, perPage, UserID int, name string) ([]*entity.CampaignModels, int64, error)
 	GetByID(ID int) (*entity.CampaignModels, error)
 	Save(payload *dto.CreateRequestCampaign) (*entity.CampaignModels, error)
-	Update(payload *dto.UpdateRequestCampaign) (*entity.CampaignModels, error)
+	Update(userID int, payload *dto.UpdateRequestCampaign) (*entity.CampaignModels, error)
 	CreateImage(payload *dto.CreateRequestCampaignImage) (*entity.CampaignImageModels, error)
 	CalculatePaginationValues(page int, totalItems int, perPage int) (int, int)
 	GetNextPage(currentPage int, totalPages int) int

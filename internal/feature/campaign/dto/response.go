@@ -29,7 +29,7 @@ func FormatSaveCampaignResponse(campaign *entity.CampaignModels) *SaveCampaignRe
 		Description:      campaign.Description,
 		Perks:            campaign.Perks,
 		GoalAmount:       campaign.GoalAmount,
-		BackerCount:      campaign.GoalAmount,
+		BackerCount:      campaign.BackerCount,
 		CurrentAmount:    campaign.CurrentAmount,
 		CreatedAt:        campaign.CreatedAt,
 		UpdatedAt:        campaign.UpdatedAt,

@@ -98,7 +98,28 @@ func (h *CampaignHandlerImpl) Save(c *fiber.Ctx) error {
 
 // Update implements campaign.CampaignHandlerInterface.
 func (h *CampaignHandlerImpl) Update(c *fiber.Ctx) error {
-	panic("unimplemented")
+	currentUser := c.Locals("CurrentUser").(*entity.UserModels)
+
+	ID, _ := strconv.Atoi(c.Params("id"))
+
+	payload := &dto.UpdateRequestCampaign{}
+
+	if err := c.BodyParser(payload); err != nil {
+		return response.SendStatusBadRequest(c, "invalid input : "+err.Error())
+	}
+
+	if err := validator.ValidateStruct(payload); err != nil {
+		return response.SendStatusBadRequest(c, "validation error : "+err.Error())
+	}
+
+	payload.ID = ID
+
+	result, err := h.service.Update(currentUser.ID, payload)
+	if err != nil {
+		return response.SendStatusBadRequest(c, err.Error())
+	}
+
+	return response.SendStatusOkWithDataResponse(c, "success", dto.FormatSaveCampaignResponse(result))
 }
 
 func NewCampaignHandler(service campaign.CampaignServiceInterface) campaign.CampaignHandlerInterface {

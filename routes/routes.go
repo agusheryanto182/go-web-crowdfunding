@@ -28,4 +28,5 @@ func CampaignRoute(app *fiber.App, handler campaign.CampaignHandlerInterface, jw
 	campaignGroup.Post("/save", middleware.Protected(jwtService, userService), handler.Save)
 	campaignGroup.Get("/:id", handler.GetByID)
 	campaignGroup.Get("/", handler.GetAll)
+	campaignGroup.Put("/update/:id", middleware.Protected(jwtService, userService), handler.Update)
 }
