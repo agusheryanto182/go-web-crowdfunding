@@ -26,4 +26,6 @@ func AuthRoute(app *fiber.App, handler auth.AuthHandlerInterface, jwtService jwt
 func CampaignRoute(app *fiber.App, handler campaign.CampaignHandlerInterface, jwtService jwt.IJwt, userService user.UserServiceInterface) {
 	campaignGroup := app.Group("api/v1/campaign")
 	campaignGroup.Post("/save", middleware.Protected(jwtService, userService), handler.Save)
+	campaignGroup.Get("/:id", handler.GetByID)
+	campaignGroup.Get("/", handler.GetAll)
 }

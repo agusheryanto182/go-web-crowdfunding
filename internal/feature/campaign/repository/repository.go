@@ -10,6 +10,25 @@ type CampaignRepositoryImpl struct {
 	DB *gorm.DB
 }
 
+// FindByNameWithPagination implements campaign.CampaignRepositoryInterface.
+func (r *CampaignRepositoryImpl) FindByNameWithPagination(page int, perPage int, name string) ([]*entity.CampaignModels, error) {
+	campaign := []*entity.CampaignModels{}
+	offset := (page - 1) * perPage
+	if err := r.DB.Offset(offset).Limit(perPage).Where("name LIKE ?", "%"+name+"%").Find(&campaign).Error; err != nil {
+		return nil, err
+	}
+	return campaign, nil
+}
+
+// GetTotalUserCount implements campaign.CampaignRepositoryInterface.
+func (r *CampaignRepositoryImpl) GetTotalCampaignCount() (int64, error) {
+	var totalItems int64
+	if err := r.DB.Model(&entity.CampaignModels{}).Count(&totalItems).Error; err != nil {
+		return 0, err
+	}
+	return totalItems, nil
+}
+
 // FindByName implements campaign.CampaignRepositoryInterface.
 func (r *CampaignRepositoryImpl) FindByName(name string) (*entity.CampaignModels, error) {
 	campaign := &entity.CampaignModels{}
@@ -25,13 +44,22 @@ func (r *CampaignRepositoryImpl) CreateImage(image *entity.CampaignImageModels) 
 }
 
 // FindAll implements campaign.CampaignRepositoryInterface.
-func (r *CampaignRepositoryImpl) FindAll() (*entity.CampaignModels, error) {
-	panic("unimplemented")
+func (r *CampaignRepositoryImpl) FindAll(page, perPage int) ([]*entity.CampaignModels, error) {
+	var campaign []*entity.CampaignModels
+	offset := (page - 1) * perPage
+	if err := r.DB.Offset(offset).Limit(perPage).Find(&campaign).Error; err != nil {
+		return nil, err
+	}
+	return campaign, nil
 }
 
 // FindByID implements campaign.CampaignRepositoryInterface.
-func (r *CampaignRepositoryImpl) FindByID(ID int) (*entity.UserModels, error) {
-	panic("unimplemented")
+func (r *CampaignRepositoryImpl) FindByID(ID int) (*entity.CampaignModels, error) {
+	campaign := &entity.CampaignModels{}
+	if err := r.DB.Model(&campaign).Where("id = ?", ID).First(&campaign).Error; err != nil {
+		return nil, err
+	}
+	return campaign, nil
 }
 
 // FindByUserID implements campaign.CampaignRepositoryInterface.

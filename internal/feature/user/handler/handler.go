@@ -97,7 +97,6 @@ func (h *UserHandlerImpl) GetAllUser(c *fiber.Ctx) error {
 		user, totalItems, err = h.userService.GetAllUser(page, perPage)
 	}
 	if err != nil {
-		c.Context().Logger()
 		return response.SendStatusInternalServerError(c, "failed to get data user : "+err.Error())
 	}
 

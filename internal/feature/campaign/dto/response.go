@@ -36,3 +36,12 @@ func FormatSaveCampaignResponse(campaign *entity.CampaignModels) *SaveCampaignRe
 	}
 	return formatted
 }
+
+func FormatCampaignsResponse(campaign []*entity.CampaignModels) []*SaveCampaignResponse {
+	var format []*SaveCampaignResponse
+	for _, campaigns := range campaign {
+		formatted := FormatSaveCampaignResponse(campaigns)
+		format = append(format, formatted)
+	}
+	return format
+}
