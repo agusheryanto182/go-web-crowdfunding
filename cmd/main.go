@@ -11,6 +11,11 @@ import (
 	userHandler "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user/handler"
 	userRepo "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user/repository"
 	userService "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user/service"
+
+	campaignHandler "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign/handler"
+	campaignRepo "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign/repository"
+	campaignService "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign/service"
+
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/middleware"
 	"github.com/agusheryanto182/go-web-crowdfunding/routes"
 	"github.com/agusheryanto182/go-web-crowdfunding/utils/caching/redis"
@@ -46,10 +51,15 @@ func main() {
 	authService := authService.NewAuthService(authRepo, userRepo, userService, hash, mail, cache, jwt)
 	authHandler := authHandler.NewAuthHandler(authService)
 
+	campaignRepo := campaignRepo.NewCampaignRepository(DB)
+	campaignService := campaignService.NewCampaignService(campaignRepo)
+	campaignHandler := campaignHandler.NewCampaignHandler(campaignService)
+
 	app.Use(middleware.Logging())
 
 	routes.UserRoute(app, userHandler, jwt, userService)
 	routes.AuthRoute(app, authHandler, jwt, userService)
+	routes.CampaignRoute(app, campaignHandler, jwt, userService)
 
 	addr := fmt.Sprintf(":%d", bootConfig.AppPort)
 

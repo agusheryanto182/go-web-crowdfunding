@@ -10,8 +10,17 @@ type CampaignRepositoryImpl struct {
 	DB *gorm.DB
 }
 
+// FindByName implements campaign.CampaignRepositoryInterface.
+func (r *CampaignRepositoryImpl) FindByName(name string) (*entity.CampaignModels, error) {
+	campaign := &entity.CampaignModels{}
+	if err := r.DB.Model(&campaign).Where("name = ?", name).First(&campaign).Error; err != nil {
+		return nil, err
+	}
+	return campaign, nil
+}
+
 // CreateImage implements campaign.CampaignRepositoryInterface.
-func (r *CampaignRepositoryImpl) CreateImage(input *entity.CampaignImageModels) (*entity.CampaignImageModels, error) {
+func (r *CampaignRepositoryImpl) CreateImage(image *entity.CampaignImageModels) (*entity.CampaignImageModels, error) {
 	panic("unimplemented")
 }
 
@@ -31,12 +40,15 @@ func (r *CampaignRepositoryImpl) FindByUserID(userID int) (*entity.CampaignModel
 }
 
 // Save implements campaign.CampaignRepositoryInterface.
-func (r *CampaignRepositoryImpl) Save(input *entity.CampaignModels) (*entity.CampaignModels, error) {
-	panic("unimplemented")
+func (r *CampaignRepositoryImpl) Save(campaign *entity.CampaignModels) (*entity.CampaignModels, error) {
+	if err := r.DB.Create(&campaign).Error; err != nil {
+		return nil, err
+	}
+	return campaign, nil
 }
 
 // Update implements campaign.CampaignRepositoryInterface.
-func (r *CampaignRepositoryImpl) Update(input *entity.CampaignModels) (*entity.CampaignModels, error) {
+func (r *CampaignRepositoryImpl) Update(campaign *entity.CampaignModels) (*entity.CampaignModels, error) {
 	panic("unimplemented")
 }
 

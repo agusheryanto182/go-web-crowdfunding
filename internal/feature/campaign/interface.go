@@ -10,9 +10,10 @@ type CampaignRepositoryInterface interface {
 	FindAll() (*entity.CampaignModels, error)
 	FindByUserID(userID int) (*entity.CampaignModels, error)
 	FindByID(ID int) (*entity.UserModels, error)
-	Save(input *entity.CampaignModels) (*entity.CampaignModels, error)
-	Update(input *entity.CampaignModels) (*entity.CampaignModels, error)
-	CreateImage(input *entity.CampaignImageModels) (*entity.CampaignImageModels, error)
+	Save(campaign *entity.CampaignModels) (*entity.CampaignModels, error)
+	Update(campaign *entity.CampaignModels) (*entity.CampaignModels, error)
+	CreateImage(image *entity.CampaignImageModels) (*entity.CampaignImageModels, error)
+	FindByName(name string) (*entity.CampaignModels, error)
 }
 
 type CampaignServiceInterface interface {

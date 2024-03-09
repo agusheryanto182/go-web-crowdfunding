@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/entity"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign/dto"
@@ -32,7 +34,26 @@ func (s *CampaignServiceImpl) GetByUserID(UserID int) (*entity.CampaignModels, e
 
 // Save implements campaign.CampaignServiceInterface.
 func (s *CampaignServiceImpl) Save(payload *dto.CreateRequestCampaign) (*entity.CampaignModels, error) {
-	panic("unimplemented")
+	checkName, _ := s.repo.FindByName(payload.Name)
+	if checkName != nil {
+		return nil, errors.New("name is already exist")
+	}
+
+	campaign := &entity.CampaignModels{
+		UserID:           payload.UserID,
+		Name:             payload.Name,
+		ShortDescription: payload.ShortDescription,
+		Description:      payload.Description,
+		Perks:            payload.Perks,
+		GoalAmount:       payload.GoalAmount,
+	}
+
+	result, err := s.repo.Save(campaign)
+	if err != nil {
+		return nil, errors.New("failed to save campaign")
+	}
+
+	return result, nil
 }
 
 // Update implements campaign.CampaignServiceInterface.

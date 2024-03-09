@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/auth"
+	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/middleware"
 	"github.com/agusheryanto182/go-web-crowdfunding/utils/jwt"
@@ -20,4 +21,9 @@ func AuthRoute(app *fiber.App, handler auth.AuthHandlerInterface, jwtService jwt
 	authGroup.Post("/sign-up", handler.SignUp)
 	authGroup.Post("/verify-otp", handler.VerifyOTP)
 	authGroup.Post("/sign-in", handler.SignIn)
+}
+
+func CampaignRoute(app *fiber.App, handler campaign.CampaignHandlerInterface, jwtService jwt.IJwt, userService user.UserServiceInterface) {
+	campaignGroup := app.Group("api/v1/campaign")
+	campaignGroup.Post("/save", middleware.Protected(jwtService, userService), handler.Save)
 }
