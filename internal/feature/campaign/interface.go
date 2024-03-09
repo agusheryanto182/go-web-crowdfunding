@@ -8,7 +8,7 @@ import (
 
 type CampaignRepositoryInterface interface {
 	FindAll(page, perPage int) ([]*entity.CampaignModels, error)
-	FindByUserID(userID int) (*entity.CampaignModels, error)
+	FindByUserID(page, perPage, userID int, name string) ([]*entity.CampaignModels, error)
 	FindByID(ID int) (*entity.CampaignModels, error)
 	Save(campaign *entity.CampaignModels) (*entity.CampaignModels, error)
 	Update(campaign *entity.CampaignModels) (*entity.CampaignModels, error)
@@ -20,7 +20,7 @@ type CampaignRepositoryInterface interface {
 
 type CampaignServiceInterface interface {
 	GetAll(page, perPage int) ([]*entity.CampaignModels, int64, error)
-	GetByUserID(UserID int) (*entity.CampaignModels, error)
+	GetByUserID(page, perPage, UserID int, name string) ([]*entity.CampaignModels, int64, error)
 	GetByID(ID int) (*entity.CampaignModels, error)
 	Save(payload *dto.CreateRequestCampaign) (*entity.CampaignModels, error)
 	Update(payload *dto.UpdateRequestCampaign) (*entity.CampaignModels, error)
@@ -33,7 +33,6 @@ type CampaignServiceInterface interface {
 
 type CampaignHandlerInterface interface {
 	GetAll(c *fiber.Ctx) error
-	GetByUserID(c *fiber.Ctx) error
 	GetByID(c *fiber.Ctx) error
 	Save(c *fiber.Ctx) error
 	Update(c *fiber.Ctx) error

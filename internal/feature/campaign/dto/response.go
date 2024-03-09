@@ -23,7 +23,7 @@ type SaveCampaignResponse struct {
 func FormatSaveCampaignResponse(campaign *entity.CampaignModels) *SaveCampaignResponse {
 	formatted := &SaveCampaignResponse{
 		ID:               campaign.ID,
-		UserID:           campaign.ID,
+		UserID:           campaign.UserID,
 		Name:             campaign.Name,
 		ShortDescription: campaign.ShortDescription,
 		Description:      campaign.Description,

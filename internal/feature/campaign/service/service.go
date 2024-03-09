@@ -8,10 +8,12 @@ import (
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/entity"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign/dto"
+	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user"
 )
 
 type CampaignServiceImpl struct {
-	repo campaign.CampaignRepositoryInterface
+	repo        campaign.CampaignRepositoryInterface
+	userService user.UserServiceInterface
 }
 
 // FindByNameWithPagination implements campaign.CampaignServiceInterface.
@@ -91,8 +93,26 @@ func (s *CampaignServiceImpl) GetByID(ID int) (*entity.CampaignModels, error) {
 }
 
 // GetByUserID implements campaign.CampaignServiceInterface.
-func (s *CampaignServiceImpl) GetByUserID(UserID int) (*entity.CampaignModels, error) {
-	panic("unimplemented")
+func (s *CampaignServiceImpl) GetByUserID(page, perPage, UserID int, name string) ([]*entity.CampaignModels, int64, error) {
+	if _, err := s.userService.GetByID(UserID); err != nil {
+		return nil, 0, err
+	}
+
+	campaigns, err := s.repo.FindByUserID(page, perPage, UserID, name)
+	if err != nil {
+		return nil, 0, errors.New("failed to get campaign : " + err.Error())
+	}
+
+	if len(campaigns) == 0 {
+		return nil, 0, errors.New("failed to get campaign with userID : " + strconv.Itoa(UserID))
+	}
+
+	totalItems, err := s.repo.GetTotalCampaignCount()
+	if err != nil {
+		return nil, 0, errors.New("failed to get campaign count")
+	}
+
+	return campaigns, totalItems, nil
 }
 
 // Save implements campaign.CampaignServiceInterface.
@@ -124,8 +144,9 @@ func (s *CampaignServiceImpl) Update(payload *dto.UpdateRequestCampaign) (*entit
 	panic("unimplemented")
 }
 
-func NewCampaignService(repo campaign.CampaignRepositoryInterface) campaign.CampaignServiceInterface {
+func NewCampaignService(repo campaign.CampaignRepositoryInterface, userService user.UserServiceInterface) campaign.CampaignServiceInterface {
 	return &CampaignServiceImpl{
-		repo: repo,
+		repo:        repo,
+		userService: userService,
 	}
 }

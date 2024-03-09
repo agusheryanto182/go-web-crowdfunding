@@ -52,7 +52,7 @@ func main() {
 	authHandler := authHandler.NewAuthHandler(authService)
 
 	campaignRepo := campaignRepo.NewCampaignRepository(DB)
-	campaignService := campaignService.NewCampaignService(campaignRepo)
+	campaignService := campaignService.NewCampaignService(campaignRepo, userService)
 	campaignHandler := campaignHandler.NewCampaignHandler(campaignService)
 
 	app.Use(middleware.Logging())

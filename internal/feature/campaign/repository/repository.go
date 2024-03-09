@@ -63,8 +63,22 @@ func (r *CampaignRepositoryImpl) FindByID(ID int) (*entity.CampaignModels, error
 }
 
 // FindByUserID implements campaign.CampaignRepositoryInterface.
-func (r *CampaignRepositoryImpl) FindByUserID(userID int) (*entity.CampaignModels, error) {
-	panic("unimplemented")
+func (r *CampaignRepositoryImpl) FindByUserID(page, perPage, userID int, name string) ([]*entity.CampaignModels, error) {
+	var campaigns []*entity.CampaignModels
+	offset := (page - 1) * perPage
+	query := r.DB.Offset(offset).Limit(perPage)
+	if name != "" {
+		if err := query.Where("user_id = ? AND name LIKE ?", userID, "%"+name+"%").Find(&campaigns).Error; err != nil {
+			return nil, err
+		}
+		return campaigns, nil
+	}
+
+	if err := query.Where("user_id = ?", userID).Find(&campaigns).Error; err != nil {
+		return nil, err
+	}
+
+	return campaigns, nil
 }
 
 // Save implements campaign.CampaignRepositoryInterface.

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/entity"
@@ -29,13 +30,19 @@ func (h *CampaignHandlerImpl) GetAll(c *fiber.Ctx) error {
 	var totalItems int64
 	var err error
 	search := c.Query("search")
+	userID, _ := strconv.Atoi(c.Query("user_id"))
 
-	if search != "" {
+	fmt.Println(search)
+	fmt.Println(userID)
+
+	switch {
+	case search != "" && userID == 0:
 		campaign, totalItems, err = h.service.FindByNameWithPagination(page, perPage, search)
-	} else {
+	case userID != 0 && search != "" || search == "":
+		campaign, totalItems, err = h.service.GetByUserID(page, perPage, userID, search)
+	default:
 		campaign, totalItems, err = h.service.GetAll(page, perPage)
 	}
-
 	if err != nil {
 		return response.SendStatusBadRequest(c, "error : "+err.Error())
 	}
@@ -60,11 +67,6 @@ func (h *CampaignHandlerImpl) GetByID(c *fiber.Ctx) error {
 	}
 
 	return response.SendStatusOkWithDataResponse(c, "success", *dto.FormatSaveCampaignResponse(campaign))
-}
-
-// GetByUserID implements campaign.CampaignHandlerInterface.
-func (h *CampaignHandlerImpl) GetByUserID(c *fiber.Ctx) error {
-	panic("unimplemented")
 }
 
 // Save implements campaign.CampaignHandlerInterface.
