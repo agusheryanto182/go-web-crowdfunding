@@ -7,17 +7,17 @@ import (
 )
 
 type CampaignModels struct {
-	ID               int
-	UserID           int
-	Name             string
-	ShortDescription string
-	Description      string
-	Perks            string
-	BackerCount      int
-	GoalAmount       int
-	CurrentAmount    int
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
+	ID               int       `gorm:"column:id;type:INT;primaryKey" json:"id"`
+	UserID           int       `gorm:"index;unique" json:"user_id"`
+	Name             string    `gorm:"column:name;type:VARCHAR(255)" json:"name"`
+	ShortDescription string    `gorm:"column:short_description;type:VARCHAR(255)" json:"short_description"`
+	Description      string    `gorm:"column:description;type:TEXT" json:"description"`
+	Perks            string    `gorm:"column:perks;type:VARHCAR(255)" json:"perks"`
+	GoalAmount       int       `gorm:"column:goal_amount;type:INT" json:"goal_amount"`
+	BackerCount      int       `gorm:"column:backer_count;type:INT" json:"backer_count"`
+	CurrentAmount    int       `gorm:"column:current_amount;type:INT" json:"current_amount"`
+	CreatedAt        time.Time `gorm:"column:created_at;type:timestamp DEFAULT CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt        time.Time `gorm:"column:updated_at;type:timestamp DEFAULT CURRENT_TIMESTAMP" json:"updated_at"`
 	CampaignImages   []CampaignImageModels
 	User             UserModels
 }
@@ -33,12 +33,12 @@ func (c CampaignModels) CurrentAmountFormatIDR() string {
 }
 
 type CampaignImageModels struct {
-	ID         int
-	CampaignID int
-	FileName   string
-	IsPrimary  int
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	ID         int       `gorm:"column:id;type:INT;primaryKey" json:"id"`
+	CampaignID int       `gorm:"index:unique" json:"campaign_id"`
+	FileName   string    `gorm:"column:file_name;type:VARCHAR(255)" json:"file_name"`
+	IsPrimary  bool      `gorm:"column:is_primary;default:false" json:"is_primary"`
+	CreatedAt  time.Time `gorm:"column:created_at;type:timestamp DEFAULT CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt  time.Time `gorm:"column:updated_at;type:timestamp DEFAULT CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
 func (CampaignModels) TableName() string {

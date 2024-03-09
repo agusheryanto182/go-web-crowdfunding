@@ -15,6 +15,11 @@ type UserModels struct {
 	UpdatedAt  time.Time `gorm:"column:updated_at;type:timestamp DEFAULT CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
+const (
+	RoleUser  = "user"
+	RoleAdmin = "admin"
+)
+
 type OTPModels struct {
 	ID         uint       `gorm:"primaryKey;autoIncrement" json:"id" `
 	UserID     int        `gorm:"index;unique" json:"user_id" `
