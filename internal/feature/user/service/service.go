@@ -31,7 +31,13 @@ func (s *UserServiceImpl) UpdateUser(userID int, payload *dto.UpdateUserRequest)
 	user.Name = payload.Name
 	user.Email = payload.Email
 	user.Occupation = payload.Occupation
-	user.Password = payload.Password
+
+	hashed, err := s.hash.GenerateHash(payload.Password)
+	if err != nil {
+		return nil, errors.New("failed to generate hash password")
+	}
+
+	user.Password = hashed
 
 	result, err := s.userRepo.UpdateUser(user)
 	if err != nil {

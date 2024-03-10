@@ -33,12 +33,12 @@ func (h *UserHandlerImpl) Update(c *fiber.Ctx) error {
 		return response.SendStatusBadRequest(c, "validation error : "+err.Error())
 	}
 
-	_, err := h.userService.UpdateUser(currentUser.ID, &updateUserRequest)
+	result, err := h.userService.UpdateUser(currentUser.ID, &updateUserRequest)
 	if err != nil {
 		return response.SendStatusBadRequest(c, "failed to update user : "+err.Error())
 	}
 
-	return response.SendStatusOkResponse(c, "success to update user")
+	return response.SendStatusOkWithDataResponse(c, "success to update user", dto.FormatterUser(result))
 }
 
 func (h *UserHandlerImpl) UploadAvatar(c *fiber.Ctx) error {

@@ -29,13 +29,19 @@ func (h *CampaignHandlerImpl) DeleteCampaign(c *fiber.Ctx) error {
 		return response.SendStatusNotFound(c, "not found : "+err.Error())
 	}
 
-	if campaign.UserID != currentUser.ID {
-		return response.SendStatusForbidden(c, "forbidden : "+err.Error())
+	switch {
+	case currentUser.Role == entity.RoleAdmin:
+		if err := h.service.DeleteCampaign(IdCampaign); err != nil {
+			return response.SendStatusBadRequest(c, "failed : "+err.Error())
+		}
+	case campaign.UserID == currentUser.ID:
+		if err := h.service.DeleteCampaign(IdCampaign); err != nil {
+			return response.SendStatusBadRequest(c, "failed : "+err.Error())
+		}
+	default:
+		return response.SendStatusForbidden(c, "forbidden : you cannot access this")
 	}
 
-	if err := h.service.DeleteCampaign(IdCampaign); err != nil {
-		return response.SendStatusBadRequest(c, "failed : "+err.Error())
-	}
 	return response.SendStatusOkResponse(c, "success")
 }
 
@@ -56,13 +62,19 @@ func (h *CampaignHandlerImpl) DeleteImageCampaign(c *fiber.Ctx) error {
 		return response.SendStatusNotFound(c, "error : "+err.Error())
 	}
 
-	if campaign.UserID != currentUser.ID {
-		return response.SendStatusForbidden(c, "forbidden : you cannot access this request")
+	switch {
+	case currentUser.Role == entity.RoleAdmin:
+		if err := h.service.DeleteImageCampaign(IdCampaign, IdImage); err != nil {
+			return response.SendStatusBadRequest(c, "failed : "+err.Error())
+		}
+	case campaign.UserID == currentUser.ID:
+		if err := h.service.DeleteImageCampaign(IdCampaign, IdImage); err != nil {
+			return response.SendStatusBadRequest(c, "failed : "+err.Error())
+		}
+	default:
+		return response.SendStatusForbidden(c, "forbidden : you cannot access this")
 	}
 
-	if err := h.service.DeleteImageCampaign(IdCampaign, IdImage); err != nil {
-		return response.SendStatusBadRequest(c, "error : "+err.Error())
-	}
 	return response.SendStatusOkResponse(c, "success")
 }
 

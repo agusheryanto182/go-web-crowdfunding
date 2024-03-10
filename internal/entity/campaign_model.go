@@ -18,7 +18,7 @@ type CampaignModels struct {
 	CurrentAmount    int                   `gorm:"column:current_amount;type:INT" json:"current_amount"`
 	CreatedAt        time.Time             `gorm:"column:created_at;type:timestamp DEFAULT CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt        time.Time             `gorm:"column:updated_at;type:timestamp DEFAULT CURRENT_TIMESTAMP" json:"updated_at"`
-	CampaignImages   []CampaignImageModels `gorm:"foreignKey:CampaignID" json:"campaign_images"`
+	CampaignImages   []CampaignImageModels `gorm:"foreignKey:CampaignID;references:ID;constraint:OnDelete:CASCADE,OnUpdate:CASCADE" json:"campaign_images"`
 	User             UserModels            `gorm:"foreignKey:UserID;references:ID;constraint:OnDelete:CASCADE,OnUpdate:CASCADE" json:"users"`
 }
 
@@ -38,7 +38,7 @@ func (c CampaignModels) CurrentAmountFormatIDR() string {
 
 type CampaignImageModels struct {
 	ID         int            `gorm:"column:id;type:INT;primaryKey" json:"id"`
-	CampaignID int            `gorm:"index:unique" json:"campaign_id"`
+	CampaignID int            `gorm:"column:campaign_id;type:int" json:"campaign_id"`
 	Campaign   CampaignModels `gorm:"foreignKey:CampaignID;references:ID;constraint:OnDelete:CASCADE,OnUpdate:CASCADE" json:"campaigns"`
 	FileName   string         `gorm:"column:file_name;type:VARCHAR(255)" json:"file_name"`
 	IsPrimary  int            `gorm:"column:is_primary;type:int;default:0" json:"is_primary"`
