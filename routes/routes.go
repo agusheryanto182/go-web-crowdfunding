@@ -31,4 +31,6 @@ func CampaignRoute(app *fiber.App, handler campaign.CampaignHandlerInterface, jw
 	campaignGroup.Put("/update/:id", middleware.Protected(jwtService, userService), handler.Update)
 	campaignGroup.Post("/image/:id/upload", middleware.Protected(jwtService, userService), handler.CreateImage)
 	campaignGroup.Put("/:id/image", middleware.Protected(jwtService, userService), handler.SetPrimaryImage)
+	campaignGroup.Delete("/:id/image", middleware.Protected(jwtService, userService), handler.DeleteImageCampaign)
+	campaignGroup.Delete("/:id", middleware.Protected(jwtService, userService), handler.DeleteCampaign)
 }

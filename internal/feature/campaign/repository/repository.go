@@ -10,6 +10,28 @@ type CampaignRepositoryImpl struct {
 	DB *gorm.DB
 }
 
+// DeleteCampaign implements campaign.CampaignRepositoryInterface.
+func (r *CampaignRepositoryImpl) DeleteCampaign(ID int) error {
+	if err := r.DB.Where("id = ?", ID).Delete(&entity.CampaignModels{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+// DeleteImageCampaign implements campaign.CampaignRepositoryInterface.
+func (r *CampaignRepositoryImpl) DeleteImageCampaign(campaignID, imageID int) error {
+	image := &entity.CampaignImageModels{}
+	if err := r.DB.Where("id = ?", imageID).First(&image).Error; err != nil {
+		return err
+	}
+
+	if err := r.DB.Where("id = ? AND campaign_id = ?", imageID, campaignID).Delete(&image).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // FindImageByID implements campaign.CampaignRepositoryInterface.
 func (r *CampaignRepositoryImpl) FindImageByID(ID int) (*entity.CampaignImageModels, error) {
 	image := &entity.CampaignImageModels{}

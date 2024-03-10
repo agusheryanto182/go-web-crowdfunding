@@ -19,6 +19,8 @@ type CampaignRepositoryInterface interface {
 	SetPrimaryImage(image *entity.CampaignImageModels) (*entity.CampaignImageModels, error)
 	FindAllImagesCampaign(campaignID int) ([]*entity.CampaignImageModels, error)
 	FindImageByID(ID int) (*entity.CampaignImageModels, error)
+	DeleteCampaign(ID int) error
+	DeleteImageCampaign(campaignID, imageID int) error
 }
 
 type CampaignServiceInterface interface {
@@ -34,6 +36,8 @@ type CampaignServiceInterface interface {
 	FindByNameWithPagination(page, perPage int, name string) ([]*entity.CampaignModels, int64, error)
 	SetPrimaryImage(payload *dto.SetPrimaryImageRequest) (*entity.CampaignImageModels, error)
 	FindImageByID(ID int) (*entity.CampaignImageModels, error)
+	DeleteCampaign(ID int) error
+	DeleteImageCampaign(campaignID, imageID int) error
 }
 
 type CampaignHandlerInterface interface {
@@ -43,4 +47,6 @@ type CampaignHandlerInterface interface {
 	Update(c *fiber.Ctx) error
 	CreateImage(c *fiber.Ctx) error
 	SetPrimaryImage(c *fiber.Ctx) error
+	DeleteCampaign(c *fiber.Ctx) error
+	DeleteImageCampaign(c *fiber.Ctx) error
 }

@@ -16,6 +16,22 @@ type CampaignServiceImpl struct {
 	userService user.UserServiceInterface
 }
 
+// DeleteCampaign implements campaign.CampaignServiceInterface.
+func (s *CampaignServiceImpl) DeleteCampaign(ID int) error {
+	if err := s.repo.DeleteCampaign(ID); err != nil {
+		return errors.New("failed to delete campaign : " + err.Error())
+	}
+	return nil
+}
+
+// DeleteImageCampaign implements campaign.CampaignServiceInterface.
+func (s *CampaignServiceImpl) DeleteImageCampaign(campaignID, imageID int) error {
+	if err := s.repo.DeleteImageCampaign(campaignID, imageID); err != nil {
+		return errors.New("failed to delete image campaign")
+	}
+	return nil
+}
+
 // FindImageByID implements campaign.CampaignServiceInterface.
 func (s *CampaignServiceImpl) FindImageByID(ID int) (*entity.CampaignImageModels, error) {
 	image, err := s.repo.FindImageByID(ID)

@@ -18,6 +18,54 @@ type CampaignHandlerImpl struct {
 	service campaign.CampaignServiceInterface
 }
 
+// DeleteCampaign implements campaign.CampaignHandlerInterface.
+func (h *CampaignHandlerImpl) DeleteCampaign(c *fiber.Ctx) error {
+	currentUser := c.Locals("CurrentUser").(*entity.UserModels)
+
+	IdCampaign, _ := strconv.Atoi(c.Params("id"))
+
+	campaign, err := h.service.GetByID(IdCampaign)
+	if err != nil {
+		return response.SendStatusNotFound(c, "not found : "+err.Error())
+	}
+
+	if campaign.UserID != currentUser.ID {
+		return response.SendStatusForbidden(c, "forbidden : "+err.Error())
+	}
+
+	if err := h.service.DeleteCampaign(IdCampaign); err != nil {
+		return response.SendStatusBadRequest(c, "failed : "+err.Error())
+	}
+	return response.SendStatusOkResponse(c, "success")
+}
+
+// DeleteImageCampaign implements campaign.CampaignHandlerInterface.
+func (h *CampaignHandlerImpl) DeleteImageCampaign(c *fiber.Ctx) error {
+	currentUser := c.Locals("CurrentUser").(*entity.UserModels)
+
+	IdCampaign, _ := strconv.Atoi(c.Params("id"))
+
+	IdImage, _ := strconv.Atoi(c.Query("id"))
+
+	if _, err := h.service.FindImageByID(IdImage); err != nil {
+		return response.SendStatusNotFound(c, "error : "+err.Error())
+	}
+
+	campaign, err := h.service.GetByID(IdCampaign)
+	if err != nil {
+		return response.SendStatusNotFound(c, "error : "+err.Error())
+	}
+
+	if campaign.UserID != currentUser.ID {
+		return response.SendStatusForbidden(c, "forbidden : you cannot access this request")
+	}
+
+	if err := h.service.DeleteImageCampaign(IdCampaign, IdImage); err != nil {
+		return response.SendStatusBadRequest(c, "error : "+err.Error())
+	}
+	return response.SendStatusOkResponse(c, "success")
+}
+
 // SetPrimaryImage implements campaign.CampaignHandlerInterface.
 func (h *CampaignHandlerImpl) SetPrimaryImage(c *fiber.Ctx) error {
 	currentUser := c.Locals("CurrentUser").(*entity.UserModels)
