@@ -2,12 +2,14 @@ package handler
 
 import (
 	"fmt"
+	"mime/multipart"
 	"strconv"
 
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/entity"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign/dto"
 	"github.com/agusheryanto182/go-web-crowdfunding/utils/response"
+	"github.com/agusheryanto182/go-web-crowdfunding/utils/upload"
 	"github.com/agusheryanto182/go-web-crowdfunding/utils/validator"
 	"github.com/gofiber/fiber/v2"
 )
@@ -16,9 +18,88 @@ type CampaignHandlerImpl struct {
 	service campaign.CampaignServiceInterface
 }
 
+// SetPrimaryImage implements campaign.CampaignHandlerInterface.
+func (h *CampaignHandlerImpl) SetPrimaryImage(c *fiber.Ctx) error {
+	currentUser := c.Locals("CurrentUser").(*entity.UserModels)
+
+	IdCampaign, _ := strconv.Atoi(c.Params("id"))
+
+	IdImage, _ := strconv.Atoi(c.Query("id"))
+
+	if _, err := h.service.FindImageByID(IdImage); err != nil {
+		return response.SendStatusNotFound(c, "error : "+err.Error())
+	}
+
+	campaign, err := h.service.GetByID(IdCampaign)
+	if err != nil {
+		return response.SendStatusNotFound(c, "error : "+err.Error())
+	}
+
+	if campaign.UserID != currentUser.ID {
+		return response.SendStatusForbidden(c, "forbidden : you cannot access this request")
+	}
+
+	payload := &dto.SetPrimaryImageRequest{
+		ID:         IdImage,
+		CampaignID: IdCampaign,
+	}
+
+	if _, err := h.service.SetPrimaryImage(payload); err != nil {
+		return response.SendStatusBadRequest(c, "error : "+err.Error())
+	}
+
+	return response.SendStatusOkResponse(c, "success")
+}
+
 // CreateImage implements campaign.CampaignHandlerInterface.
 func (h *CampaignHandlerImpl) CreateImage(c *fiber.Ctx) error {
-	panic("unimplemented")
+	currentUser := c.Locals("CurrentUser").(*entity.UserModels)
+	ID, _ := strconv.Atoi(c.Params("id"))
+
+	setPrimaryImage := &dto.SetPrimaryImageRequest{}
+
+	campaign, err := h.service.GetByID(ID)
+	if campaign == nil {
+		return response.SendStatusNotFound(c, "not found : "+err.Error())
+	}
+	if campaign.UserID != currentUser.ID {
+		return response.SendStatusForbidden(c, "forbidden : "+err.Error())
+	}
+
+	payload := &dto.CreateRequestCampaignImage{}
+
+	form, _ := c.MultipartForm()
+	files := form.File["images"]
+	for _, file := range files {
+		fileToUpload, err := file.Open()
+		if err != nil {
+			return response.SendStatusInternalServerError(c, "failed to open file : "+err.Error())
+		}
+		defer func(fileToUpload multipart.File) {
+			_ = fileToUpload.Close()
+		}(fileToUpload)
+
+		imageURL, err := upload.ImageUploadHelper(fileToUpload)
+		if err != nil {
+			return response.SendStatusInternalServerError(c, "failed to upload image : "+err.Error())
+		}
+
+		payload.FileName = imageURL
+		payload.CampaignID = ID
+
+		result, err := h.service.CreateImage(payload)
+		if err != nil {
+			return response.SendStatusBadRequest(c, "error : "+err.Error())
+		}
+		setPrimaryImage.ID = result.ID
+		setPrimaryImage.CampaignID = payload.CampaignID
+	}
+
+	if _, err := h.service.SetPrimaryImage(setPrimaryImage); err != nil {
+		return response.SendStatusBadRequest(c, err.Error())
+	}
+
+	return response.SendStatusOkResponse(c, "success")
 }
 
 // GetAll implements campaign.CampaignHandlerInterface.

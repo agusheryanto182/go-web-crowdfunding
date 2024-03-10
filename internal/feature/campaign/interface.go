@@ -16,6 +16,9 @@ type CampaignRepositoryInterface interface {
 	FindByName(name string) (*entity.CampaignModels, error)
 	GetTotalCampaignCount() (int64, error)
 	FindByNameWithPagination(page, perPage int, name string) ([]*entity.CampaignModels, error)
+	SetPrimaryImage(image *entity.CampaignImageModels) (*entity.CampaignImageModels, error)
+	FindAllImagesCampaign(campaignID int) ([]*entity.CampaignImageModels, error)
+	FindImageByID(ID int) (*entity.CampaignImageModels, error)
 }
 
 type CampaignServiceInterface interface {
@@ -29,6 +32,8 @@ type CampaignServiceInterface interface {
 	GetNextPage(currentPage int, totalPages int) int
 	GetPrevPage(currentPage int) int
 	FindByNameWithPagination(page, perPage int, name string) ([]*entity.CampaignModels, int64, error)
+	SetPrimaryImage(payload *dto.SetPrimaryImageRequest) (*entity.CampaignImageModels, error)
+	FindImageByID(ID int) (*entity.CampaignImageModels, error)
 }
 
 type CampaignHandlerInterface interface {
@@ -37,4 +42,5 @@ type CampaignHandlerInterface interface {
 	Save(c *fiber.Ctx) error
 	Update(c *fiber.Ctx) error
 	CreateImage(c *fiber.Ctx) error
+	SetPrimaryImage(c *fiber.Ctx) error
 }

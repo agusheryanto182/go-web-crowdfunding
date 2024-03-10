@@ -41,7 +41,7 @@ type CampaignImageModels struct {
 	CampaignID int            `gorm:"index:unique" json:"campaign_id"`
 	Campaign   CampaignModels `gorm:"foreignKey:CampaignID;references:ID;constraint:OnDelete:CASCADE,OnUpdate:CASCADE" json:"campaigns"`
 	FileName   string         `gorm:"column:file_name;type:VARCHAR(255)" json:"file_name"`
-	IsPrimary  bool           `gorm:"column:is_primary;default:false" json:"is_primary"`
+	IsPrimary  int            `gorm:"column:is_primary;type:int;default:0" json:"is_primary"`
 	CreatedAt  time.Time      `gorm:"column:created_at;type:timestamp DEFAULT CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt  time.Time      `gorm:"column:updated_at;type:timestamp DEFAULT CURRENT_TIMESTAMP" json:"updated_at"`
 }

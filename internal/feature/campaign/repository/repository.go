@@ -10,6 +10,32 @@ type CampaignRepositoryImpl struct {
 	DB *gorm.DB
 }
 
+// FindImageByID implements campaign.CampaignRepositoryInterface.
+func (r *CampaignRepositoryImpl) FindImageByID(ID int) (*entity.CampaignImageModels, error) {
+	image := &entity.CampaignImageModels{}
+	if err := r.DB.Where("id = ?", ID).First(image).Error; err != nil {
+		return nil, err
+	}
+	return image, nil
+}
+
+// FindAllImages implements campaign.CampaignRepositoryInterface.
+func (r *CampaignRepositoryImpl) FindAllImagesCampaign(campaignID int) ([]*entity.CampaignImageModels, error) {
+	var campaignImages []*entity.CampaignImageModels
+	if err := r.DB.Where("campaign_id = ?", campaignID).Find(&campaignImages).Error; err != nil {
+		return nil, err
+	}
+	return campaignImages, nil
+}
+
+// SetPrimaryImage implements campaign.CampaignRepositoryInterface.
+func (r *CampaignRepositoryImpl) SetPrimaryImage(image *entity.CampaignImageModels) (*entity.CampaignImageModels, error) {
+	if err := r.DB.Model(&image).Where("id = ? AND campaign_id = ?", image.ID, image.CampaignID).Update("is_primary", image.IsPrimary).Error; err != nil {
+		return nil, err
+	}
+	return image, nil
+}
+
 // FindByNameWithPagination implements campaign.CampaignRepositoryInterface.
 func (r *CampaignRepositoryImpl) FindByNameWithPagination(page int, perPage int, name string) ([]*entity.CampaignModels, error) {
 	campaign := []*entity.CampaignModels{}
@@ -40,7 +66,10 @@ func (r *CampaignRepositoryImpl) FindByName(name string) (*entity.CampaignModels
 
 // CreateImage implements campaign.CampaignRepositoryInterface.
 func (r *CampaignRepositoryImpl) CreateImage(image *entity.CampaignImageModels) (*entity.CampaignImageModels, error) {
-	panic("unimplemented")
+	if err := r.DB.Create(&image).Error; err != nil {
+		return nil, err
+	}
+	return image, nil
 }
 
 // FindAll implements campaign.CampaignRepositoryInterface.

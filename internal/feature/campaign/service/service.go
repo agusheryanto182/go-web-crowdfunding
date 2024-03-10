@@ -16,6 +16,45 @@ type CampaignServiceImpl struct {
 	userService user.UserServiceInterface
 }
 
+// FindImageByID implements campaign.CampaignServiceInterface.
+func (s *CampaignServiceImpl) FindImageByID(ID int) (*entity.CampaignImageModels, error) {
+	image, err := s.repo.FindImageByID(ID)
+	if err != nil {
+		return nil, errors.New("image with ID = " + strconv.Itoa(ID) + " is not found")
+	}
+	return image, nil
+}
+
+// SetPrimaryImage implements campaign.CampaignServiceInterface.
+func (s *CampaignServiceImpl) SetPrimaryImage(payload *dto.SetPrimaryImageRequest) (*entity.CampaignImageModels, error) {
+	image := &entity.CampaignImageModels{
+		ID:         payload.ID,
+		CampaignID: payload.CampaignID,
+		IsPrimary:  1,
+	}
+
+	campaignImages, err := s.repo.FindAllImagesCampaign(payload.CampaignID)
+	if err != nil {
+		return nil, errors.New("failed get all images by campaign id")
+	}
+
+	for _, images := range campaignImages {
+		if images.IsPrimary == 1 {
+			images.IsPrimary = 0
+			_, err := s.repo.SetPrimaryImage(images)
+			if err != nil {
+				return nil, errors.New("failed set image : " + err.Error())
+			}
+		}
+	}
+
+	result, err := s.repo.SetPrimaryImage(image)
+	if err != nil {
+		return nil, errors.New("failed set image to primary : " + err.Error())
+	}
+	return result, nil
+}
+
 // FindByNameWithPagination implements campaign.CampaignServiceInterface.
 func (s *CampaignServiceImpl) FindByNameWithPagination(page int, perPage int, name string) ([]*entity.CampaignModels, int64, error) {
 	campaign, err := s.repo.FindByNameWithPagination(page, perPage, name)
@@ -64,7 +103,17 @@ func (s *CampaignServiceImpl) GetPrevPage(currentPage int) int {
 
 // CreateImage implements campaign.CampaignServiceInterface.
 func (s *CampaignServiceImpl) CreateImage(payload *dto.CreateRequestCampaignImage) (*entity.CampaignImageModels, error) {
-	panic("unimplemented")
+	campaignImage := &entity.CampaignImageModels{
+		CampaignID: payload.CampaignID,
+		FileName:   payload.FileName,
+		IsPrimary:  0,
+	}
+
+	result, err := s.repo.CreateImage(campaignImage)
+	if err != nil {
+		return nil, errors.New("failed to create image")
+	}
+	return result, nil
 }
 
 // GetAll implements campaign.CampaignServiceInterface.

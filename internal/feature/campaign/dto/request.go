@@ -20,6 +20,12 @@ type UpdateRequestCampaign struct {
 
 type CreateRequestCampaignImage struct {
 	CampaignID int    `json:"campaign_id"`
-	FileName   string `json:"file_name" validate:"required"`
+	FileName   string `json:"file_name"`
 	IsPrimary  bool   `json:"is_primary"`
+}
+
+type SetPrimaryImageRequest struct {
+	ID         int  `json:"id"`
+	CampaignID int  `json:"campaign_id"`
+	IsPrimary  bool `json:"is_primary"`
 }
