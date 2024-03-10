@@ -14,6 +14,7 @@ type UserRepositoryInterface interface {
 	FindAllUser(page, perPage int) ([]*entity.UserModels, error)
 	FindUserByName(page, perPage int, name string) ([]*entity.UserModels, error)
 	GetTotalUserCount() (int64, error)
+	DeleteUser(ID int) error
 }
 
 type UserServiceInterface interface {
@@ -26,10 +27,12 @@ type UserServiceInterface interface {
 	CalculatePaginationValues(page int, totalItems int, perPage int) (int, int)
 	GetNextPage(currentPage int, totalPages int) int
 	GetPrevPage(currentPage int) int
+	DeleteUser(ID int) error
 }
 
 type UserHandlerInterface interface {
 	Update(c *fiber.Ctx) error
 	UploadAvatar(c *fiber.Ctx) error
 	GetAllUser(c *fiber.Ctx) error
+	Delete(c *fiber.Ctx) error
 }

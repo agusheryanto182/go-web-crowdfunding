@@ -15,11 +15,12 @@ type UserServiceImpl struct {
 	hash     utils.HashInterface
 }
 
-func NewUserService(userRepo user.UserRepositoryInterface, hash utils.HashInterface) user.UserServiceInterface {
-	return &UserServiceImpl{
-		userRepo: userRepo,
-		hash:     hash,
+// DeleteUser implements user.UserServiceInterface.
+func (s *UserServiceImpl) DeleteUser(ID int) error {
+	if err := s.userRepo.DeleteUser(ID); err != nil {
+		return errors.New("failed to delete user")
 	}
+	return nil
 }
 
 func (s *UserServiceImpl) UpdateUser(userID int, payload *dto.UpdateUserRequest) (*entity.UserModels, error) {
@@ -129,4 +130,11 @@ func (s *UserServiceImpl) GetPrevPage(currentPage int) int {
 	}
 
 	return 1
+}
+
+func NewUserService(userRepo user.UserRepositoryInterface, hash utils.HashInterface) user.UserServiceInterface {
+	return &UserServiceImpl{
+		userRepo: userRepo,
+		hash:     hash,
+	}
 }

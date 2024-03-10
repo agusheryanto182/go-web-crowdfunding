@@ -17,8 +17,23 @@ type UserHandlerImpl struct {
 	userService user.UserServiceInterface
 }
 
-func NewUserHandler(userService user.UserServiceInterface) user.UserHandlerInterface {
-	return &UserHandlerImpl{userService: userService}
+// Delete implements user.UserHandlerInterface.
+func (h *UserHandlerImpl) Delete(c *fiber.Ctx) error {
+	ID, _ := strconv.Atoi(c.Params("id"))
+	currentUser := c.Locals("CurrentUser").(*entity.UserModels)
+	if currentUser.Role != entity.RoleAdmin {
+		return response.SendStatusForbidden(c, "forbidden : you do not have permission")
+	}
+
+	if _, err := h.userService.GetByID(ID); err != nil {
+		return response.SendStatusNotFound(c, "error : "+err.Error())
+	}
+
+	if err := h.userService.DeleteUser(ID); err != nil {
+		return response.SendStatusBadRequest(c, "error : "+err.Error())
+	}
+
+	return response.SendStatusOkResponse(c, "success")
 }
 
 func (h *UserHandlerImpl) Update(c *fiber.Ctx) error {
@@ -105,5 +120,8 @@ func (h *UserHandlerImpl) GetAllUser(c *fiber.Ctx) error {
 	prevPage := h.userService.GetPrevPage(currentPage)
 
 	return response.SendPaginationResponse(c, dto.FormatterUsers(user), currentPage, totalPages, int(totalItems), nextPage, prevPage, "success")
+}
 
+func NewUserHandler(userService user.UserServiceInterface) user.UserHandlerInterface {
+	return &UserHandlerImpl{userService: userService}
 }

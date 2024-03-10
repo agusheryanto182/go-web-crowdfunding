@@ -10,10 +10,12 @@ type UserRepositoryImpl struct {
 	DB *gorm.DB
 }
 
-func NewUserRepository(DB *gorm.DB) user.UserRepositoryInterface {
-	return &UserRepositoryImpl{
-		DB: DB,
+// DeleteUser implements user.UserRepositoryInterface.
+func (r *UserRepositoryImpl) DeleteUser(ID int) error {
+	if err := r.DB.Where("id = ?", ID).Delete(&entity.UserModels{}).Error; err != nil {
+		return err
 	}
+	return nil
 }
 
 func (r *UserRepositoryImpl) UpdateUser(user *entity.UserModels) (*entity.UserModels, error) {
@@ -75,4 +77,10 @@ func (r *UserRepositoryImpl) GetTotalUserCount() (int64, error) {
 		return 0, err
 	}
 	return totalItems, nil
+}
+
+func NewUserRepository(DB *gorm.DB) user.UserRepositoryInterface {
+	return &UserRepositoryImpl{
+		DB: DB,
+	}
 }
