@@ -39,7 +39,7 @@ func (c CampaignModels) CurrentAmountFormatIDR() string {
 type CampaignImageModels struct {
 	ID         int            `gorm:"column:id;type:INT;primaryKey" json:"id"`
 	CampaignID int            `gorm:"column:campaign_id;type:int" json:"campaign_id"`
-	Campaign   CampaignModels `gorm:"foreignKey:CampaignID;references:ID;constraint:OnDelete:CASCADE,OnUpdate:CASCADE" json:"campaigns"`
+	Campaign   CampaignModels `gorm:"foreignKey:CampaignID;references:ID;constraint:OnDelete:CASCADE,OnUpdate:CASCADE"`
 	FileName   string         `gorm:"column:file_name;type:VARCHAR(255)" json:"file_name"`
 	IsPrimary  int            `gorm:"column:is_primary;type:int;default:0" json:"is_primary"`
 	CreatedAt  time.Time      `gorm:"column:created_at;type:timestamp DEFAULT CURRENT_TIMESTAMP" json:"created_at"`

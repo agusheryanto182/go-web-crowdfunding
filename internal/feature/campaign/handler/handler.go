@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"mime/multipart"
 	"strconv"
 
@@ -173,13 +172,10 @@ func (h *CampaignHandlerImpl) GetAll(c *fiber.Ctx) error {
 	search := c.Query("search")
 	userID, _ := strconv.Atoi(c.Query("user_id"))
 
-	fmt.Println(search)
-	fmt.Println(userID)
-
 	switch {
 	case search != "" && userID == 0:
 		campaign, totalItems, err = h.service.FindByNameWithPagination(page, perPage, search)
-	case userID != 0 && search != "" || search == "":
+	case userID != 0 && search != "" && search == "":
 		campaign, totalItems, err = h.service.GetByUserID(page, perPage, userID, search)
 	default:
 		campaign, totalItems, err = h.service.GetAll(page, perPage)

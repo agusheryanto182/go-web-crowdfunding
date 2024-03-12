@@ -98,7 +98,7 @@ func (r *CampaignRepositoryImpl) CreateImage(image *entity.CampaignImageModels) 
 func (r *CampaignRepositoryImpl) FindAll(page, perPage int) ([]*entity.CampaignModels, error) {
 	var campaign []*entity.CampaignModels
 	offset := (page - 1) * perPage
-	if err := r.DB.Offset(offset).Limit(perPage).Find(&campaign).Error; err != nil {
+	if err := r.DB.Preload("CampaignImages", "campaign_images.is_primary = 1").Offset(offset).Limit(perPage).Find(&campaign).Error; err != nil {
 		return nil, err
 	}
 	return campaign, nil
@@ -107,7 +107,7 @@ func (r *CampaignRepositoryImpl) FindAll(page, perPage int) ([]*entity.CampaignM
 // FindByID implements campaign.CampaignRepositoryInterface.
 func (r *CampaignRepositoryImpl) FindByID(ID int) (*entity.CampaignModels, error) {
 	campaign := &entity.CampaignModels{}
-	if err := r.DB.Model(&campaign).Where("id = ?", ID).First(&campaign).Error; err != nil {
+	if err := r.DB.Preload("CampaignImages").Where("id = ?", ID).First(&campaign).Error; err != nil {
 		return nil, err
 	}
 	return campaign, nil
