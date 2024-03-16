@@ -7,16 +7,20 @@ import (
 )
 
 type TransactionRepositoryImpl struct {
-	DB *gorm.DB
+	db *gorm.DB
 }
 
 // FindAll implements transaction.TransactionRepositoryInterface.
-func (t *TransactionRepositoryImpl) FindAll() ([]*entity.TransactionModels, error) {
-	panic("unimplemented")
+func (r *TransactionRepositoryImpl) FindAll() ([]*entity.TransactionModels, error) {
+	var transactions []*entity.TransactionModels
+	if err := r.db.Preload("Campaigns").Preload("Users").Order("id desc").Find(&transactions).Error; err != nil {
+		return nil, err
+	}
+	return transactions, nil
 }
 
 // GetByCampaignID implements transaction.TransactionRepositoryInterface.
-func (t *TransactionRepositoryImpl) GetByCampaignID(campaignID int) ([]*entity.TransactionModels, error) {
+func (r *TransactionRepositoryImpl) GetByCampaignID(campaignID int) ([]*entity.TransactionModels, error) {
 	panic("unimplemented")
 }
 
@@ -26,22 +30,22 @@ func (t *TransactionRepositoryImpl) GetByID(ID int) (*entity.TransactionModels, 
 }
 
 // GetByUserID implements transaction.TransactionRepositoryInterface.
-func (t *TransactionRepositoryImpl) GetByUserID(userID int) ([]*entity.TransactionModels, error) {
+func (r *TransactionRepositoryImpl) GetByUserID(userID int) ([]*entity.TransactionModels, error) {
 	panic("unimplemented")
 }
 
 // Save implements transaction.TransactionRepositoryInterface.
-func (t *TransactionRepositoryImpl) Save(transaction *entity.TransactionModels) (*entity.TransactionModels, error) {
+func (r *TransactionRepositoryImpl) Save(transaction *entity.TransactionModels) (*entity.TransactionModels, error) {
 	panic("unimplemented")
 }
 
 // Update implements transaction.TransactionRepositoryInterface.
-func (t *TransactionRepositoryImpl) Update(transaction *entity.TransactionModels) (*entity.TransactionModels, error) {
+func (r *TransactionRepositoryImpl) Update(transaction *entity.TransactionModels) (*entity.TransactionModels, error) {
 	panic("unimplemented")
 }
 
-func NewTransactionRepository(DB *gorm.DB) transaction.TransactionRepositoryInterface {
+func NewTransactionRepository(db *gorm.DB) transaction.TransactionRepositoryInterface {
 	return &TransactionRepositoryImpl{
-		DB: DB,
+		db: db,
 	}
 }

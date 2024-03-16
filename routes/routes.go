@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/auth"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign"
+	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/transaction"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/middleware"
 	"github.com/agusheryanto182/go-web-crowdfunding/utils/jwt"
@@ -34,4 +35,9 @@ func CampaignRoute(app *fiber.App, handler campaign.CampaignHandlerInterface, jw
 	campaignGroup.Put("/:id/image", middleware.Protected(jwtService, userService), handler.SetPrimaryImage)
 	campaignGroup.Delete("/:id/image", middleware.Protected(jwtService, userService), handler.DeleteImageCampaign)
 	campaignGroup.Delete("/:id", middleware.Protected(jwtService, userService), handler.DeleteCampaign)
+}
+
+func TransactionRoute(app *fiber.App, handler transaction.TransactionHandlerInterface, jwtService jwt.IJwt, userService user.UserServiceInterface) {
+	transactionGroup := app.Group("api/v1/transaction")
+	transactionGroup.Get("/", middleware.Protected(jwtService, userService), handler.GetCampaignTransactions)
 }

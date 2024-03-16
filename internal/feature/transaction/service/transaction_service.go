@@ -11,27 +11,31 @@ type TransactionServiceImpl struct {
 }
 
 // CreateTransaction implements transaction.TransactionServiceInterface.
-func (t *TransactionServiceImpl) CreateTransaction(payload *dto.CreateTransactionInput) (*entity.TransactionModels, error) {
+func (s *TransactionServiceImpl) CreateTransaction(payload *dto.CreateTransactionInput) (*entity.TransactionModels, error) {
 	panic("unimplemented")
 }
 
 // GetAllTransactions implements transaction.TransactionServiceInterface.
-func (t *TransactionServiceImpl) GetAllTransactions() ([]*entity.TransactionModels, error) {
-	panic("unimplemented")
+func (s *TransactionServiceImpl) GetAllTransactions() ([]*entity.TransactionModels, error) {
+	transactions, err := s.repo.FindAll()
+	if err != nil {
+		return nil, err
+	}
+	return transactions, nil
 }
 
 // GetTransactionByCampaignID implements transaction.TransactionServiceInterface.
-func (t *TransactionServiceImpl) GetTransactionByCampaignID(campaignID int) ([]*entity.TransactionModels, error) {
+func (s *TransactionServiceImpl) GetTransactionByCampaignID(campaignID int) ([]*entity.TransactionModels, error) {
 	panic("unimplemented")
 }
 
 // GetTransactionByID implements transaction.TransactionServiceInterface.
-func (t *TransactionServiceImpl) GetTransactionByID(ID int) (*entity.TransactionModels, error) {
+func (s *TransactionServiceImpl) GetTransactionByID(ID int) (*entity.TransactionModels, error) {
 	panic("unimplemented")
 }
 
 // GetTransactionByUserID implements transaction.TransactionServiceInterface.
-func (t *TransactionServiceImpl) GetTransactionByUserID(userID int) ([]*entity.TransactionModels, error) {
+func (s *TransactionServiceImpl) GetTransactionByUserID(userID int) ([]*entity.TransactionModels, error) {
 	panic("unimplemented")
 }
 

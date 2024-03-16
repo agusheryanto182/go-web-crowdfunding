@@ -24,6 +24,7 @@ type TransactionServiceInterface interface {
 }
 
 type TransactionHandlerInterface interface {
+	GetAllCampaignTransactions(c *fiber.Ctx) error
 	GetCampaignTransactions(c *fiber.Ctx) error
 	GetUserTransactions(c *fiber.Ctx) error
 	CreateTransaction(c *fiber.Ctx) error
