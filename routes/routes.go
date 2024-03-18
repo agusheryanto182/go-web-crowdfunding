@@ -39,5 +39,7 @@ func CampaignRoute(app *fiber.App, handler campaign.CampaignHandlerInterface, jw
 
 func TransactionRoute(app *fiber.App, handler transaction.TransactionHandlerInterface, jwtService jwt.IJwt, userService user.UserServiceInterface) {
 	transactionGroup := app.Group("api/v1/transaction")
-	transactionGroup.Get("/", middleware.Protected(jwtService, userService), handler.GetCampaignTransactions)
+	transactionGroup.Get("/", middleware.Protected(jwtService, userService), handler.GetAllCampaignTransactions)
+	transactionGroup.Post("/", middleware.Protected(jwtService, userService), handler.CreateTransaction)
+	transactionGroup.Post("/notifications", handler.GetNotification)
 }

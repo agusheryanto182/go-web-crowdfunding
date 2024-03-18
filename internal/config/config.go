@@ -19,6 +19,8 @@ type Config struct {
 
 	Database database
 	Redis    Redis
+
+	Midtrans Midtrans
 }
 
 type database struct {
@@ -32,6 +34,11 @@ type database struct {
 type Redis struct {
 	Addr string
 	Pass string
+}
+
+type Midtrans struct {
+	ClientKeyMidtrans string
+	ServerKeyMidtrans string
 }
 
 func InitConfig() *Config {
@@ -101,6 +108,14 @@ func loadConfig() *Config {
 
 	if value, found := os.LookupEnv("REDIS_PASS"); found {
 		res.Redis.Pass = value
+	}
+
+	if value, found := os.LookupEnv("CLIENT_MIDTRANS"); found {
+		res.Midtrans.ClientKeyMidtrans = value
+	}
+
+	if value, found := os.LookupEnv("SERVER_MIDTRANS"); found {
+		res.Midtrans.ServerKeyMidtrans = value
 	}
 
 	return res

@@ -21,6 +21,7 @@ type TransactionServiceInterface interface {
 	GetTransactionByID(ID int) (*entity.TransactionModels, error)
 	CreateTransaction(payload *dto.CreateTransactionInput) (*entity.TransactionModels, error)
 	GetAllTransactions() ([]*entity.TransactionModels, error)
+	ProcessTransactions(input *dto.TransactionNotificationInput) error
 }
 
 type TransactionHandlerInterface interface {

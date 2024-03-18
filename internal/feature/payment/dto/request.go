@@ -1,8 +1,6 @@
 package dto
 
-import (
-	"github.com/agusheryanto182/go-web-crowdfunding/internal/entity"
-)
+import "github.com/agusheryanto182/go-web-crowdfunding/internal/entity"
 
 type GetCampaignTransactionsInput struct {
 	ID   int `uri:"id" validate:"required"`
@@ -15,8 +13,7 @@ type CreateTransactionInput struct {
 	User       entity.UserModels
 }
 
-type 
-TransactionNotificationInput struct {
+type TransactionNotificationInput struct {
 	TransactionStatus string `json:"transaction_status"`
 	OrderID           string `json:"order_id"`
 	PaymentType       string `json:"payment_type"`

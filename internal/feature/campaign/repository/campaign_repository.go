@@ -142,7 +142,7 @@ func (r *CampaignRepositoryImpl) Save(campaign *entity.CampaignModels) (*entity.
 
 // Update implements campaign.CampaignRepositoryInterface.
 func (r *CampaignRepositoryImpl) Update(campaign *entity.CampaignModels) (*entity.CampaignModels, error) {
-	if err := r.DB.Model(&campaign).Updates(&campaign).Error; err != nil {
+	if err := r.DB.Save(&campaign).Error; err != nil {
 		return nil, err
 	}
 	return campaign, nil

@@ -7,6 +7,7 @@ import (
 	authHandler "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/auth/handler"
 	authRepo "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/auth/repository"
 	authService "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/auth/service"
+	paymentService "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/payment/service"
 
 	userHandler "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user/handler"
 	userRepo "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user/repository"
@@ -45,6 +46,8 @@ func main() {
 
 	DB := database.InitialDB(*bootConfig)
 
+	paymentService := paymentService.NewPaymentService(*bootConfig)
+
 	database.TableMigration(DB)
 
 	userRepo := userRepo.NewUserRepository(DB)
@@ -60,8 +63,8 @@ func main() {
 	campaignHandler := campaignHandler.NewCampaignHandler(campaignService)
 
 	transactionRepo := transactionRepo.NewTransactionRepository(DB)
-	transactionService := transactionService.NewTransactionService(transactionRepo)
-	transactionHandler := transactionHandler.NewTransactionHandler(transactionService)
+	transactionService := transactionService.NewTransactionService(transactionRepo, paymentService, campaignRepo)
+	transactionHandler := transactionHandler.NewTransactionHandler(transactionService, campaignService)
 
 	app.Use(middleware.Logging())
 

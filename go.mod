@@ -41,6 +41,7 @@ require (
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/vektra/mockery v1.1.2 // indirect
+	github.com/veritrans/go-midtrans v0.0.0-20210616100512-16326c5eeb00 // indirect
 	github.com/wneessen/go-mail v0.4.1 // indirect
 	golang.org/x/crypto v0.20.0 // indirect
 	golang.org/x/mod v0.8.0 // indirect

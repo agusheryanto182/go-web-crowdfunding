@@ -25,8 +25,12 @@ func (r *TransactionRepositoryImpl) GetByCampaignID(campaignID int) ([]*entity.T
 }
 
 // GetByID implements transaction.TransactionRepositoryInterface.
-func (t *TransactionRepositoryImpl) GetByID(ID int) (*entity.TransactionModels, error) {
-	panic("unimplemented")
+func (r *TransactionRepositoryImpl) GetByID(ID int) (*entity.TransactionModels, error) {
+	transaction := &entity.TransactionModels{}
+	if err := r.db.Where("id = ?", ID).First(&transaction).Error; err != nil {
+		return nil, err
+	}
+	return transaction, nil
 }
 
 // GetByUserID implements transaction.TransactionRepositoryInterface.
@@ -36,12 +40,18 @@ func (r *TransactionRepositoryImpl) GetByUserID(userID int) ([]*entity.Transacti
 
 // Save implements transaction.TransactionRepositoryInterface.
 func (r *TransactionRepositoryImpl) Save(transaction *entity.TransactionModels) (*entity.TransactionModels, error) {
-	panic("unimplemented")
+	if err := r.db.Create(&transaction).Error; err != nil {
+		return nil, err
+	}
+	return transaction, nil
 }
 
 // Update implements transaction.TransactionRepositoryInterface.
 func (r *TransactionRepositoryImpl) Update(transaction *entity.TransactionModels) (*entity.TransactionModels, error) {
-	panic("unimplemented")
+	if err := r.db.Save(&transaction).Error; err != nil {
+		return nil, err
+	}
+	return transaction, nil
 }
 
 func NewTransactionRepository(db *gorm.DB) transaction.TransactionRepositoryInterface {
