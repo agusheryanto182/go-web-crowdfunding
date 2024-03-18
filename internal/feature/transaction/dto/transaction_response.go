@@ -46,7 +46,6 @@ type TransactionFormatter struct {
 	UserID     int    `json:"user_id"`
 	Amount     int    `json:"amount"`
 	Status     string `json:"status"`
-	Code       string `json:"code"`
 	PaymentURL string `json:"payment_url"`
 }
 
@@ -57,7 +56,53 @@ func FormatTransaction(transaction *entity.TransactionModels) TransactionFormatt
 	formatter.UserID = transaction.UserID
 	formatter.Amount = transaction.Amount
 	formatter.Status = transaction.Status
-	formatter.Code = transaction.Code
 	formatter.PaymentURL = transaction.PaymentURL
 	return formatter
+}
+
+type UserTransactionFormatter struct {
+	ID        int               `json:"id"`
+	Amount    int               `json:"amount"`
+	Status    string            `json:"status"`
+	CreatedAt time.Time         `json:"created_at"`
+	Campaign  CampaignFormatter `json:"campaign"`
+}
+
+type CampaignFormatter struct {
+	Name     string `json:"name"`
+	ImageURL string `json:"image_url"`
+}
+
+func FormatUserTransaction(transaction *entity.TransactionModels) UserTransactionFormatter {
+	formatter := UserTransactionFormatter{}
+	formatter.ID = transaction.ID
+	formatter.Amount = transaction.Amount
+	formatter.Status = transaction.Status
+	formatter.CreatedAt = transaction.CreatedAt
+
+	campaignFormatter := CampaignFormatter{}
+	campaignFormatter.Name = transaction.Campaigns.Name
+	campaignFormatter.ImageURL = ""
+
+	if len(transaction.Campaigns.CampaignImages) > 0 {
+		campaignFormatter.ImageURL = transaction.Campaigns.CampaignImages[0].FileName
+	}
+	formatter.Campaign = campaignFormatter
+
+	return formatter
+}
+
+func FormatUserTransactions(transactions []*entity.TransactionModels) []UserTransactionFormatter {
+	if len(transactions) == 0 {
+		return []UserTransactionFormatter{}
+	}
+
+	var transactionsFormatter []UserTransactionFormatter
+
+	for _, transaction := range transactions {
+		formatter := FormatUserTransaction(transaction)
+		transactionsFormatter = append(transactionsFormatter, formatter)
+	}
+
+	return transactionsFormatter
 }

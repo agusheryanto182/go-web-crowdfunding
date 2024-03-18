@@ -10,7 +10,6 @@ type TransactionModels struct {
 	UserID     int            `gorm:"column:user_id" json:"user_id"`
 	Amount     int            `gorm:"column:amount;type:int" json:"amount"`
 	Status     string         `gorm:"column:status;type:VARCHAR(255)" json:"status"`
-	Code       string         `gorm:"column:code;type:VARCHAR(255)" json:"code"`
 	PaymentURL string         `gorm:"column:payment_url;type:VARCHAR(255)" json:"payment_url"`
 	Campaigns  CampaignModels `gorm:"foreignKey:CampaignID" json:"campaigns"`
 	Users      UserModels     `gorm:"foreignKey:UserID;references:ID;constraint:OnDelete:CASCADE,OnUpdate:CASCADE" json:"users"`

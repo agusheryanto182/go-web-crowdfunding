@@ -97,17 +97,29 @@ func (s *TransactionServiceImpl) GetAllTransactions() ([]*entity.TransactionMode
 
 // GetTransactionByCampaignID implements transaction.TransactionServiceInterface.
 func (s *TransactionServiceImpl) GetTransactionByCampaignID(campaignID int) ([]*entity.TransactionModels, error) {
-	panic("unimplemented")
+	transactions, err := s.repo.GetByCampaignID(campaignID)
+	if err != nil {
+		return nil, err
+	}
+	return transactions, nil
 }
 
 // GetTransactionByID implements transaction.TransactionServiceInterface.
 func (s *TransactionServiceImpl) GetTransactionByID(ID int) (*entity.TransactionModels, error) {
-	panic("unimplemented")
+	transactions, err := s.repo.GetByID(ID)
+	if err != nil {
+		return nil, err
+	}
+	return transactions, nil
 }
 
 // GetTransactionByUserID implements transaction.TransactionServiceInterface.
 func (s *TransactionServiceImpl) GetTransactionByUserID(userID int) ([]*entity.TransactionModels, error) {
-	panic("unimplemented")
+	transactions, err := s.repo.GetByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+	return transactions, nil
 }
 
 func NewTransactionService(

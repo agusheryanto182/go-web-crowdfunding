@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/entity"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/transaction"
@@ -17,7 +20,26 @@ type TransactionHandlerImpl struct {
 
 // GetCampaignTransactions implements transaction.TransactionHandlerInterface.
 func (h *TransactionHandlerImpl) GetCampaignTransactions(c *fiber.Ctx) error {
-	panic("unimplemented")
+	campaignID, _ := strconv.Atoi(c.Params("id"))
+	campaign, err := h.campaignService.GetByID(campaignID)
+	if err != nil {
+		return response.SendStatusBadRequest(c, "error : "+err.Error())
+	}
+
+	if campaign == nil {
+		return response.SendStatusNotFound(c, "not found : "+err.Error())
+	}
+
+	result, err := h.service.GetTransactionByCampaignID(campaignID)
+	if err != nil {
+		return response.SendStatusBadRequest(c, "error : "+err.Error())
+	}
+
+	if result == nil {
+		return response.SendStatusNotFound(c, "not found : "+err.Error())
+	}
+
+	return response.SendStatusOkWithDataResponse(c, "success", dto.FormatCampaignTransactions(result))
 }
 
 // CreateTransaction implements transaction.TransactionHandlerInterface.
@@ -92,7 +114,20 @@ func (h *TransactionHandlerImpl) GetNotification(c *fiber.Ctx) error {
 
 // GetUserTransactions implements transaction.TransactionHandlerInterface.
 func (h *TransactionHandlerImpl) GetUserTransactions(c *fiber.Ctx) error {
-	panic("unimplemented")
+	currentUser := c.Locals("CurrentUser").(*entity.UserModels)
+
+	fmt.Println(currentUser.ID)
+
+	if currentUser.Role == entity.RoleAdmin {
+		return response.SendStatusForbidden(c, "forbidden : you do not have access for this route")
+	}
+
+	transactions, err := h.service.GetTransactionByUserID(currentUser.ID)
+	if err != nil {
+		return response.SendStatusBadRequest(c, "error : "+err.Error())
+	}
+
+	return response.SendStatusOkWithDataResponse(c, "succcess", dto.FormatUserTransactions(transactions))
 }
 
 func NewTransactionHandler(service transaction.TransactionServiceInterface, campaignService campaign.CampaignServiceInterface) transaction.TransactionHandlerInterface {

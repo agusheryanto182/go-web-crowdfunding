@@ -21,7 +21,13 @@ func (r *TransactionRepositoryImpl) FindAll() ([]*entity.TransactionModels, erro
 
 // GetByCampaignID implements transaction.TransactionRepositoryInterface.
 func (r *TransactionRepositoryImpl) GetByCampaignID(campaignID int) ([]*entity.TransactionModels, error) {
-	panic("unimplemented")
+	var transaction []*entity.TransactionModels
+
+	if err := r.db.Preload("Campaigns").Preload("Users").Where("campaign_id = ?", campaignID).Find(&transaction).Error; err != nil {
+		return nil, err
+	}
+
+	return transaction, nil
 }
 
 // GetByID implements transaction.TransactionRepositoryInterface.
@@ -35,7 +41,12 @@ func (r *TransactionRepositoryImpl) GetByID(ID int) (*entity.TransactionModels, 
 
 // GetByUserID implements transaction.TransactionRepositoryInterface.
 func (r *TransactionRepositoryImpl) GetByUserID(userID int) ([]*entity.TransactionModels, error) {
-	panic("unimplemented")
+	var transaction []*entity.TransactionModels
+
+	if err := r.db.Preload("Campaigns").Where("user_id = ?", userID).Find(&transaction).Error; err != nil {
+		return nil, err
+	}
+	return transaction, nil
 }
 
 // Save implements transaction.TransactionRepositoryInterface.
