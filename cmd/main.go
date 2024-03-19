@@ -63,7 +63,7 @@ func main() {
 	campaignHandler := campaignHandler.NewCampaignHandler(campaignService)
 
 	transactionRepo := transactionRepo.NewTransactionRepository(DB)
-	transactionService := transactionService.NewTransactionService(transactionRepo, paymentService, campaignRepo)
+	transactionService := transactionService.NewTransactionService(transactionRepo, paymentService, campaignRepo, campaignService)
 	transactionHandler := transactionHandler.NewTransactionHandler(transactionService, campaignService)
 
 	app.Use(middleware.Logging())

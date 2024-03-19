@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/entity"
@@ -15,6 +14,7 @@ type TransactionServiceImpl struct {
 	repo               transaction.TransactionRepositoryInterface
 	paymentService     payment.PaymentServiceInterface
 	campaignRepository campaign.CampaignRepositoryInterface
+	campaignService    campaign.CampaignServiceInterface
 }
 
 // ProcessTransactions implements transaction.TransactionServiceInterface.
@@ -74,8 +74,6 @@ func (s *TransactionServiceImpl) CreateTransaction(payload *dto.CreateTransactio
 		return nil, err
 	}
 
-	fmt.Println(paymentURL)
-
 	newTransaction.PaymentURL = paymentURL
 
 	newResult, err := s.repo.Update(newTransaction)
@@ -87,21 +85,31 @@ func (s *TransactionServiceImpl) CreateTransaction(payload *dto.CreateTransactio
 }
 
 // GetAllTransactions implements transaction.TransactionServiceInterface.
-func (s *TransactionServiceImpl) GetAllTransactions() ([]*entity.TransactionModels, error) {
-	transactions, err := s.repo.FindAll()
+func (s *TransactionServiceImpl) GetAllTransactions(page, perPage int) ([]*entity.TransactionModels, int64, error) {
+	transactions, err := s.repo.FindAll(page, perPage)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return transactions, nil
+
+	totalItems, err := s.repo.GetTotalTransactionCount()
+	if err != nil {
+		return nil, 0, err
+	}
+	return transactions, totalItems, nil
 }
 
 // GetTransactionByCampaignID implements transaction.TransactionServiceInterface.
-func (s *TransactionServiceImpl) GetTransactionByCampaignID(campaignID int) ([]*entity.TransactionModels, error) {
-	transactions, err := s.repo.GetByCampaignID(campaignID)
+func (s *TransactionServiceImpl) GetTransactionByCampaignID(page, perPage, campaignID int) ([]*entity.TransactionModels, int64, error) {
+	transactions, err := s.repo.GetByCampaignID(page, perPage, campaignID)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return transactions, nil
+
+	totalItems, err := s.repo.GetTotalTransactionCountByCampaign(campaignID)
+	if err != nil {
+		return nil, 0, err
+	}
+	return transactions, totalItems, nil
 }
 
 // GetTransactionByID implements transaction.TransactionServiceInterface.
@@ -114,21 +122,27 @@ func (s *TransactionServiceImpl) GetTransactionByID(ID int) (*entity.Transaction
 }
 
 // GetTransactionByUserID implements transaction.TransactionServiceInterface.
-func (s *TransactionServiceImpl) GetTransactionByUserID(userID int) ([]*entity.TransactionModels, error) {
-	transactions, err := s.repo.GetByUserID(userID)
+func (s *TransactionServiceImpl) GetTransactionByUserID(page, perPage, userID int) ([]*entity.TransactionModels, int64, error) {
+	transactions, err := s.repo.GetByUserID(page, perPage, userID)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return transactions, nil
+	totalItems, err := s.repo.GetTotalTransactionCountByUser(userID)
+	if err != nil {
+		return nil, 0, err
+	}
+	return transactions, totalItems, nil
 }
 
 func NewTransactionService(
 	repo transaction.TransactionRepositoryInterface,
 	paymentService payment.PaymentServiceInterface,
-	campaignRepository campaign.CampaignRepositoryInterface) transaction.TransactionServiceInterface {
+	campaignRepository campaign.CampaignRepositoryInterface,
+	campaignService campaign.CampaignServiceInterface) transaction.TransactionServiceInterface {
 	return &TransactionServiceImpl{
 		repo:               repo,
 		paymentService:     paymentService,
 		campaignRepository: campaignRepository,
+		campaignService:    campaignService,
 	}
 }

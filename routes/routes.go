@@ -38,10 +38,10 @@ func CampaignRoute(app *fiber.App, handler campaign.CampaignHandlerInterface, jw
 }
 
 func TransactionRoute(app *fiber.App, handler transaction.TransactionHandlerInterface, jwtService jwt.IJwt, userService user.UserServiceInterface) {
-	transactionGroup := app.Group("api/v1")
-	transactionGroup.Get("/admin/transaction", middleware.Protected(jwtService, userService), handler.GetAllCampaignTransactions)
-	transactionGroup.Post("/transaction", middleware.Protected(jwtService, userService), handler.CreateTransaction)
-	transactionGroup.Post("/transaction/notifications", handler.GetNotification)
-	transactionGroup.Get("/transaction", middleware.Protected(jwtService, userService), handler.GetUserTransactions)
-	transactionGroup.Get("/transaction/:id", handler.GetCampaignTransactions)
+	transactionGroup := app.Group("api/v1/transaction")
+	transactionGroup.Get("/show", middleware.Protected(jwtService, userService), handler.GetAllCampaignTransactions)
+	transactionGroup.Post("/", middleware.Protected(jwtService, userService), handler.CreateTransaction)
+	transactionGroup.Post("/notifications", handler.GetNotification)
+	transactionGroup.Get("/", middleware.Protected(jwtService, userService), handler.GetUserTransactions)
+	transactionGroup.Get("/:id", handler.GetCampaignTransactions)
 }

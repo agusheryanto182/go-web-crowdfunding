@@ -7,20 +7,23 @@ import (
 )
 
 type TransactionRepositoryInterface interface {
-	GetByCampaignID(campaignID int) ([]*entity.TransactionModels, error)
-	GetByUserID(userID int) ([]*entity.TransactionModels, error)
+	GetByCampaignID(page, perPage, campaignID int) ([]*entity.TransactionModels, error)
+	GetByUserID(page, perPage, userID int) ([]*entity.TransactionModels, error)
 	GetByID(ID int) (*entity.TransactionModels, error)
 	Save(transaction *entity.TransactionModels) (*entity.TransactionModels, error)
 	Update(transaction *entity.TransactionModels) (*entity.TransactionModels, error)
-	FindAll() ([]*entity.TransactionModels, error)
+	FindAll(page, perPage int) ([]*entity.TransactionModels, error)
+	GetTotalTransactionCount() (int64, error)
+	GetTotalTransactionCountByCampaign(campaignID int) (int64, error)
+	GetTotalTransactionCountByUser(userID int) (int64, error)
 }
 
 type TransactionServiceInterface interface {
-	GetTransactionByCampaignID(campaignID int) ([]*entity.TransactionModels, error)
-	GetTransactionByUserID(userID int) ([]*entity.TransactionModels, error)
+	GetTransactionByCampaignID(page, perPage int, campaignID int) ([]*entity.TransactionModels, int64, error)
+	GetTransactionByUserID(page, perPage int, userID int) ([]*entity.TransactionModels, int64, error)
 	GetTransactionByID(ID int) (*entity.TransactionModels, error)
 	CreateTransaction(payload *dto.CreateTransactionInput) (*entity.TransactionModels, error)
-	GetAllTransactions() ([]*entity.TransactionModels, error)
+	GetAllTransactions(page, perPage int) ([]*entity.TransactionModels, int64, error)
 	ProcessTransactions(input *dto.TransactionNotificationInput) error
 }
 

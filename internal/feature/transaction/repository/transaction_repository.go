@@ -10,20 +10,52 @@ type TransactionRepositoryImpl struct {
 	db *gorm.DB
 }
 
+// GetTotalTransactionCountByCampaign implements transaction.TransactionRepositoryInterface.
+func (r *TransactionRepositoryImpl) GetTotalTransactionCountByCampaign(campaignID int) (int64, error) {
+	var totalItems int64
+	if err := r.db.Model(&entity.TransactionModels{}).Where("campaign_id = ?", campaignID).Count(&totalItems).Error; err != nil {
+		return 0, err
+	}
+	return totalItems, nil
+}
+
+// GetTotalTransactionCountByUser implements transaction.TransactionRepositoryInterface.
+func (r *TransactionRepositoryImpl) GetTotalTransactionCountByUser(userID int) (int64, error) {
+	var totalItems int64
+	if err := r.db.Model(&entity.TransactionModels{}).Where("user_id = ?", userID).Count(&totalItems).Error; err != nil {
+		return 0, err
+	}
+	return totalItems, nil
+}
+
+// GetTotalTransactionCount implements transaction.TransactionRepositoryInterface.
+func (r *TransactionRepositoryImpl) GetTotalTransactionCount() (int64, error) {
+	var totalItems int64
+	if err := r.db.Model(&entity.TransactionModels{}).Count(&totalItems).Error; err != nil {
+		return 0, err
+	}
+	return totalItems, nil
+}
+
 // FindAll implements transaction.TransactionRepositoryInterface.
-func (r *TransactionRepositoryImpl) FindAll() ([]*entity.TransactionModels, error) {
+func (r *TransactionRepositoryImpl) FindAll(page, perPage int) ([]*entity.TransactionModels, error) {
 	var transactions []*entity.TransactionModels
-	if err := r.db.Preload("Campaigns").Preload("Users").Order("id desc").Find(&transactions).Error; err != nil {
+	offset := (page - 1) * perPage
+	query := r.db.Offset(offset).Limit(perPage)
+
+	if err := query.Preload("Campaigns").Preload("Users").Order("id desc").Find(&transactions).Error; err != nil {
 		return nil, err
 	}
 	return transactions, nil
 }
 
 // GetByCampaignID implements transaction.TransactionRepositoryInterface.
-func (r *TransactionRepositoryImpl) GetByCampaignID(campaignID int) ([]*entity.TransactionModels, error) {
+func (r *TransactionRepositoryImpl) GetByCampaignID(page, perPage, campaignID int) ([]*entity.TransactionModels, error) {
 	var transaction []*entity.TransactionModels
+	offset := (page - 1) * perPage
+	query := r.db.Offset(offset).Limit(perPage)
 
-	if err := r.db.Preload("Campaigns").Preload("Users").Where("campaign_id = ?", campaignID).Find(&transaction).Error; err != nil {
+	if err := query.Preload("Campaigns").Preload("Users").Where("campaign_id = ?", campaignID).Find(&transaction).Error; err != nil {
 		return nil, err
 	}
 
@@ -40,10 +72,12 @@ func (r *TransactionRepositoryImpl) GetByID(ID int) (*entity.TransactionModels, 
 }
 
 // GetByUserID implements transaction.TransactionRepositoryInterface.
-func (r *TransactionRepositoryImpl) GetByUserID(userID int) ([]*entity.TransactionModels, error) {
+func (r *TransactionRepositoryImpl) GetByUserID(page, perPage, userID int) ([]*entity.TransactionModels, error) {
 	var transaction []*entity.TransactionModels
+	offset := (page - 1) * perPage
+	query := r.db.Offset(offset).Limit(perPage)
 
-	if err := r.db.Preload("Campaigns").Where("user_id = ?", userID).Find(&transaction).Error; err != nil {
+	if err := query.Preload("Campaigns").Where("user_id = ?", userID).Find(&transaction).Error; err != nil {
 		return nil, err
 	}
 	return transaction, nil

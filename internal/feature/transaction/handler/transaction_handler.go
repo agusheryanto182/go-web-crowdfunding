@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/entity"
@@ -21,6 +20,14 @@ type TransactionHandlerImpl struct {
 // GetCampaignTransactions implements transaction.TransactionHandlerInterface.
 func (h *TransactionHandlerImpl) GetCampaignTransactions(c *fiber.Ctx) error {
 	campaignID, _ := strconv.Atoi(c.Params("id"))
+	page, _ := strconv.Atoi(c.Query("page"))
+	perPage := 7
+
+	var transactions []*entity.TransactionModels
+
+	var totalItems int64
+	var err error
+
 	campaign, err := h.campaignService.GetByID(campaignID)
 	if err != nil {
 		return response.SendStatusBadRequest(c, "error : "+err.Error())
@@ -30,16 +37,20 @@ func (h *TransactionHandlerImpl) GetCampaignTransactions(c *fiber.Ctx) error {
 		return response.SendStatusNotFound(c, "not found : "+err.Error())
 	}
 
-	result, err := h.service.GetTransactionByCampaignID(campaignID)
+	transactions, totalItems, err = h.service.GetTransactionByCampaignID(page, perPage, campaignID)
 	if err != nil {
 		return response.SendStatusBadRequest(c, "error : "+err.Error())
 	}
 
-	if result == nil {
+	if transactions == nil {
 		return response.SendStatusNotFound(c, "not found : "+err.Error())
 	}
 
-	return response.SendStatusOkWithDataResponse(c, "success", dto.FormatCampaignTransactions(result))
+	currentPage, totalPages := h.campaignService.CalculatePaginationValues(page, int(totalItems), perPage)
+	nextPage := h.campaignService.GetNextPage(currentPage, totalPages)
+	prevPage := h.campaignService.GetPrevPage(currentPage)
+
+	return response.SendPaginationResponse(c, dto.FormatCampaignTransactions(transactions), currentPage, totalPages, int(totalItems), nextPage, prevPage, "success")
 }
 
 // CreateTransaction implements transaction.TransactionHandlerInterface.
@@ -85,7 +96,15 @@ func (h *TransactionHandlerImpl) GetAllCampaignTransactions(c *fiber.Ctx) error 
 		return response.SendStatusForbidden(c, "forbidden : you do not have permission to access this page")
 	}
 
-	transactions, err := h.service.GetAllTransactions()
+	page, _ := strconv.Atoi(c.Query("page"))
+	perPage := 7
+
+	var transactions []*entity.TransactionModels
+
+	var totalItems int64
+	var err error
+
+	transactions, totalItems, err = h.service.GetAllTransactions(page, perPage)
 	if err != nil {
 		return response.SendStatusBadRequest(c, err.Error())
 	}
@@ -94,7 +113,12 @@ func (h *TransactionHandlerImpl) GetAllCampaignTransactions(c *fiber.Ctx) error 
 		return response.SendStatusNotFound(c, "transaction is not found")
 	}
 
-	return response.SendStatusOkWithDataResponse(c, "success", dto.FormatCampaignTransactions(transactions))
+	currentPage, totalPages := h.campaignService.CalculatePaginationValues(page, int(totalItems), perPage)
+	nextPage := h.campaignService.GetNextPage(currentPage, totalPages)
+	prevPage := h.campaignService.GetPrevPage(currentPage)
+
+	return response.SendPaginationResponse(c, dto.FormatCampaignTransactions(transactions), currentPage, totalPages, int(totalItems), nextPage, prevPage, "success")
+
 }
 
 // GetNotification implements transaction.TransactionHandlerInterface.
@@ -115,19 +139,29 @@ func (h *TransactionHandlerImpl) GetNotification(c *fiber.Ctx) error {
 // GetUserTransactions implements transaction.TransactionHandlerInterface.
 func (h *TransactionHandlerImpl) GetUserTransactions(c *fiber.Ctx) error {
 	currentUser := c.Locals("CurrentUser").(*entity.UserModels)
-
-	fmt.Println(currentUser.ID)
-
 	if currentUser.Role == entity.RoleAdmin {
 		return response.SendStatusForbidden(c, "forbidden : you do not have access for this route")
 	}
 
-	transactions, err := h.service.GetTransactionByUserID(currentUser.ID)
+	page, _ := strconv.Atoi(c.Query("page"))
+	perPage := 7
+
+	var transactions []*entity.TransactionModels
+
+	var totalItems int64
+	var err error
+
+	transactions, totalItems, err = h.service.GetTransactionByUserID(page, perPage, currentUser.ID)
 	if err != nil {
 		return response.SendStatusBadRequest(c, "error : "+err.Error())
 	}
 
-	return response.SendStatusOkWithDataResponse(c, "succcess", dto.FormatUserTransactions(transactions))
+	currentPage, totalPages := h.campaignService.CalculatePaginationValues(page, int(totalItems), perPage)
+	nextPage := h.campaignService.GetNextPage(currentPage, totalPages)
+	prevPage := h.campaignService.GetPrevPage(currentPage)
+
+	return response.SendPaginationResponse(c, dto.FormatCampaignTransactions(transactions), currentPage, totalPages, int(totalItems), nextPage, prevPage, "success")
+
 }
 
 func NewTransactionHandler(service transaction.TransactionServiceInterface, campaignService campaign.CampaignServiceInterface) transaction.TransactionHandlerInterface {

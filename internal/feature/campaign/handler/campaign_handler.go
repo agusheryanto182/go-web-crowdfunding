@@ -164,7 +164,7 @@ func (h *CampaignHandlerImpl) CreateImage(c *fiber.Ctx) error {
 // GetAll implements campaign.CampaignHandlerInterface.
 func (h *CampaignHandlerImpl) GetAll(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page"))
-	perPage := 5
+	perPage := 7
 
 	var campaign []*entity.CampaignModels
 	var totalItems int64
