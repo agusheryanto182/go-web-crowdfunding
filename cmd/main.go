@@ -21,6 +21,8 @@ import (
 	transactionRepo "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/transaction/repository"
 	transactionService "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/transaction/service"
 
+	assistantRepo "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/assistant/repository"
+
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/middleware"
 	"github.com/agusheryanto182/go-web-crowdfunding/routes"
 	"github.com/agusheryanto182/go-web-crowdfunding/utils/caching/redis"
@@ -50,24 +52,32 @@ func main() {
 
 	database.TableMigration(DB)
 
+	// user
 	userRepo := userRepo.NewUserRepository(DB)
 	userService := userService.NewUserService(userRepo, hash)
 	userHandler := userHandler.NewUserHandler(userService)
 
+	// auth
 	authRepo := authRepo.NewAuthRepository(DB)
 	authService := authService.NewAuthService(authRepo, userRepo, userService, hash, mail, cache, jwt)
 	authHandler := authHandler.NewAuthHandler(authService)
 
+	// campaign
 	campaignRepo := campaignRepo.NewCampaignRepository(DB)
 	campaignService := campaignService.NewCampaignService(campaignRepo, userService)
 	campaignHandler := campaignHandler.NewCampaignHandler(campaignService)
 
+	// transaction
 	transactionRepo := transactionRepo.NewTransactionRepository(DB)
 	transactionService := transactionService.NewTransactionService(transactionRepo, paymentService, campaignRepo, campaignService)
 	transactionHandler := transactionHandler.NewTransactionHandler(transactionService, campaignService)
 
+	// assistant
+	assistantRepo := assistantRepo.NewAssistantRepository(DB)
+
 	app.Use(middleware.Logging())
 
+	// route
 	routes.UserRoute(app, userHandler, jwt, userService)
 	routes.AuthRoute(app, authHandler, jwt, userService)
 	routes.CampaignRoute(app, campaignHandler, jwt, userService)

@@ -13,8 +13,7 @@ type RepositoryAssistantInterface interface {
 	CreateQuestion(chat *entity.AssistantModel) error
 	CreateAnswer(chat *entity.AssistantModel) error
 	GetLastDonateByUserID(userID uint64) ([]*entity.TransactionModels, error)
-	GetTopRatedCampaigns() ([]*entity.CampaignModels, error)
-	GetTrendDonateCampaigns() ([]string, error)
+	GetTopDonatedCampaigns() ([]string, error)
 }
 
 type ServiceAssistantInterface interface {

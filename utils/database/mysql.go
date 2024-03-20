@@ -29,6 +29,7 @@ func TableMigration(db *gorm.DB) {
 		entity.CampaignModels{},
 		entity.CampaignImageModels{},
 		entity.TransactionModels{},
+		entity.AssistantModel{},
 	)
 	if err != nil {
 		log.Fatal("Migration table is failed", err.Error())
