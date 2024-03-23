@@ -8,6 +8,7 @@ import (
 	authRepo "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/auth/repository"
 	authService "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/auth/service"
 	paymentService "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/payment/service"
+	"github.com/sashabaranov/go-openai"
 
 	userHandler "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user/handler"
 	userRepo "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/user/repository"
@@ -21,7 +22,9 @@ import (
 	transactionRepo "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/transaction/repository"
 	transactionService "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/transaction/service"
 
+	assistantHandler "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/assistant/handler"
 	assistantRepo "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/assistant/repository"
+	assistantService "github.com/agusheryanto182/go-web-crowdfunding/internal/feature/assistant/service"
 
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/middleware"
 	"github.com/agusheryanto182/go-web-crowdfunding/routes"
@@ -72,8 +75,11 @@ func main() {
 	transactionService := transactionService.NewTransactionService(transactionRepo, paymentService, campaignRepo, campaignService)
 	transactionHandler := transactionHandler.NewTransactionHandler(transactionService, campaignService)
 
+	var client = openai.NewClient(bootConfig.OpenAiApiKey)
 	// assistant
 	assistantRepo := assistantRepo.NewAssistantRepository(DB)
+	assistantService := assistantService.NewServiceAssistant(assistantRepo, client, *bootConfig)
+	assistantHandler := assistantHandler.NewHandlerAssistant(assistantService)
 
 	app.Use(middleware.Logging())
 
@@ -82,6 +88,7 @@ func main() {
 	routes.AuthRoute(app, authHandler, jwt, userService)
 	routes.CampaignRoute(app, campaignHandler, jwt, userService)
 	routes.TransactionRoute(app, transactionHandler, jwt, userService)
+	routes.AssistantRoutes(app, assistantHandler, jwt, userService)
 
 	addr := fmt.Sprintf(":%d", bootConfig.AppPort)
 

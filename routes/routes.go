@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/assistant"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/auth"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/campaign"
 	"github.com/agusheryanto182/go-web-crowdfunding/internal/feature/transaction"
@@ -45,3 +46,9 @@ func TransactionRoute(app *fiber.App, handler transaction.TransactionHandlerInte
 	transactionGroup.Get("/", middleware.Protected(jwtService, userService), handler.GetUserTransactions)
 	transactionGroup.Get("/:id", handler.GetCampaignTransactions)
 }
+
+func AssistantRoutes(app *fiber.App, handler assistant.HandlerAssistantInterface, jwtService jwt.IJwt, userService user.UserServiceInterface) {
+	assistantGroup := app.Group("api/v1/assistant")
+	assistantGroup.Post("/question", middleware.Protected(jwtService, userService), handler.CreateQuestion)
+}
+

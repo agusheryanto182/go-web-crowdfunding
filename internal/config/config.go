@@ -21,6 +21,8 @@ type Config struct {
 	Redis    Redis
 
 	Midtrans Midtrans
+
+	OpenAiApiKey string
 }
 
 type database struct {
@@ -116,6 +118,10 @@ func loadConfig() *Config {
 
 	if value, found := os.LookupEnv("SERVER_MIDTRANS"); found {
 		res.Midtrans.ServerKeyMidtrans = value
+	}
+
+	if value, found := os.LookupEnv("OPENAIAPIKEY"); found {
+		res.OpenAiApiKey = value
 	}
 
 	return res
