@@ -50,5 +50,8 @@ func TransactionRoute(app *fiber.App, handler transaction.TransactionHandlerInte
 func AssistantRoutes(app *fiber.App, handler assistant.HandlerAssistantInterface, jwtService jwt.IJwt, userService user.UserServiceInterface) {
 	assistantGroup := app.Group("api/v1/assistant")
 	assistantGroup.Post("/question", middleware.Protected(jwtService, userService), handler.CreateQuestion)
+	assistantGroup.Post("/answer", middleware.Protected(jwtService, userService), handler.CreateAnswer)
+	assistantGroup.Get("/recommendation-campaigns", middleware.Protected(jwtService, userService), handler.GetCampaignByUserID)
+	assistantGroup.Get("/get-chat", middleware.Protected(jwtService, userService), handler.GetChatByIdUser)
+	assistantGroup.Post("/generate-articles", middleware.Protected(jwtService, userService), handler.GenerateArticle)
 }
-

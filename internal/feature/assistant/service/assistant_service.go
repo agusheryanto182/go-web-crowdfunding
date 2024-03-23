@@ -210,7 +210,12 @@ func (s *ServiceAssistantImpl) GetAnswerFromAi(chat []openai.ChatCompletionMessa
 
 // GetChatByUserID implements assistant.ServiceAssistantInterface.
 func (s *ServiceAssistantImpl) GetChatByUserID(userID uint64) ([]*entity.AssistantModel, error) {
-	panic("unimplemented")
+	chats, err := s.repo.GetChatByIdUser(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return chats, nil
 }
 
 func NewServiceAssistant(repo assistant.RepositoryAssistantInterface, openai *openai.Client, config config.Config) assistant.ServiceAssistantInterface {
