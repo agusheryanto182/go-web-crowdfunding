@@ -14,7 +14,6 @@ type VerifyOTPRequest struct {
 }
 
 type SignInUserRequest struct {
-	Email           string `json:"email" validate:"required,email"`
-	Password        string `json:"password" validate:"required,eqfield=PasswordConfirm"`
-	PasswordConfirm string `json:"password_confirm" validate:"required"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"`
 }
